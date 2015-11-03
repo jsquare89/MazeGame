@@ -10,7 +10,7 @@ namespace MazeGame
         /// </summary>
         static void Main(string[] args)
         {
-            using (Game1 game = new Game1())
+            using (MazeGame game = new MazeGame())
             {
                 game.Run();
             }

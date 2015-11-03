@@ -19,6 +19,10 @@ namespace MazeGame
 		GraphicsDeviceManager graphics;
 		SpriteBatch spriteBatch;
 
+		Camera camera;
+		Maze maze;
+		BasicEffect effect;
+
 		public MazeGame()
 		{
 			graphics = new GraphicsDeviceManager( this );
@@ -34,6 +38,14 @@ namespace MazeGame
 		protected override void Initialize()
 		{
 			// TODO: Add your initialization logic here
+			camera = new Camera(
+				new Vector3(0.5f, 0.5f, 0.5f),
+				0,
+				GraphicsDevice.Viewport.AspectRatio,
+				0.05f,
+				100f);
+			effect = new BasicEffect(GraphicsDevice);
+			maze = new Maze(GraphicsDevice);
 
 			base.Initialize();
 		}
@@ -84,6 +96,7 @@ namespace MazeGame
 			GraphicsDevice.Clear( Color.CornflowerBlue );
 
 			// TODO: Add your drawing code here
+			maze.Draw(camera, effect);
 
 			base.Draw( gameTime );
 		}
