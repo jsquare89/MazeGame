@@ -23,6 +23,9 @@ namespace MazeGame
 		Maze maze;
 		BasicEffect effect;
 
+		float moveScale = 1.5f;
+		float rotateScale = MathHelper.PiOver2;
+
 		public MazeGame()
 		{
 			graphics = new GraphicsDeviceManager( this );
@@ -40,7 +43,7 @@ namespace MazeGame
 			// TODO: Add your initialization logic here
 			camera = new Camera(
 				new Vector3(0.5f, 0.5f, 0.5f),
-				0,
+				MathHelper.PiOver4,
 				GraphicsDevice.Viewport.AspectRatio,
 				0.05f,
 				100f);
@@ -83,6 +86,47 @@ namespace MazeGame
 				this.Exit();
 
 			// TODO: Add your update logic here
+			float elapsed = (float)gameTime.ElapsedGameTime.TotalSeconds;
+			KeyboardState keyState = Keyboard.GetState();
+			float moveAmount = 0;
+
+			if (keyState.IsKeyDown(Keys.Right))
+			{
+				camera.Rotation = MathHelper.WrapAngle(
+					camera.Rotation - (rotateScale * elapsed));
+			}
+
+			if (keyState.IsKeyDown(Keys.Left))
+			{
+				camera.Rotation = MathHelper.WrapAngle(
+					camera.Rotation + (rotateScale * elapsed));
+			}
+
+			if (keyState.IsKeyDown(Keys.Up))
+			{
+				//camera.MoveForward(moveScale * elapsed);
+				moveAmount = moveScale * elapsed;
+			}
+
+			if (keyState.IsKeyDown(Keys.Down))
+			{
+				//camera.MoveForward(-moveScale * elapsed);
+				moveAmount = -moveScale * elapsed;
+			}
+
+			if (moveAmount != 0)
+			{
+				Vector3 newLocation = camera.PreviewMove(moveAmount);
+				bool moveOk = true;
+
+				if (newLocation.X < 0 || newLocation.X > Maze.MAZE_WIDTH)
+					moveOk = false;
+				if (newLocation.Z < 0 || newLocation.Z > Maze.MAZE_HEIGHT)
+					moveOk = false;
+				
+				if (moveOk)
+					camera.MoveForward(moveAmount);
+			}
 
 			base.Update( gameTime );
 		}

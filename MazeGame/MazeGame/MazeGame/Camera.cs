@@ -87,5 +87,17 @@ namespace MazeGame
 			needViewResync = true;
 		}
 		
+		public Vector3 PreviewMove(float scale)
+		{
+			Matrix rotate = Matrix.CreateRotationY(rotation);
+			Vector3 forward = new Vector3(0, 0, scale);
+			forward = Vector3.Transform(forward, rotate);
+			return (position + forward);
+		}
+
+		public void MoveForward(float scale)
+		{
+			MoveTo(PreviewMove(scale), rotation);	
+		}
 	}
 }
