@@ -43,7 +43,7 @@ namespace MazeGame
 			// TODO: Add your initialization logic here
 			camera = new Camera(
 				new Vector3(0.5f, 0.5f, 0.5f),
-				MathHelper.PiOver4,
+				0,
 				GraphicsDevice.Viewport.AspectRatio,
 				0.05f,
 				100f);
