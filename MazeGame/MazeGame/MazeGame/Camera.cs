@@ -9,7 +9,8 @@ namespace MazeGame
     class Camera
 	{
 		private Vector3 position = Vector3.Zero;
-		private float rotation;
+		private float rotationX;
+        private float rotationY;
 		private Vector3 lookAt;
 		private Vector3 baseCameraReference = new Vector3(0, 0, 1);
 		private bool needViewResync = true;
@@ -33,18 +34,31 @@ namespace MazeGame
 			}
 		}
 
-		public float Rotation
+		public float RotationX
 		{
 			get
 			{
-				return rotation;		
+				return rotationX;		
 			}	
 			set
 			{
-				rotation = value;
+				rotationX = value;
 				UpdateLookAt();
 			}
 		}
+
+        public float RotationY
+        {
+            get
+            {
+                return rotationY;
+            }
+            set
+            {
+                rotationY = value;
+                UpdateLookAt();
+            }
+        }
 
 		public Matrix View
 		{
@@ -72,14 +86,15 @@ namespace MazeGame
 		public void MoveTo( Vector3 position, float rotation )
 		{
 			this.position = position;
-			this.rotation = rotation;
+			this.rotationX = rotation;
 			UpdateLookAt();
 		}
 
 
 		private void UpdateLookAt()
 		{
-			Matrix rotationMatrix = Matrix.CreateRotationY(rotation);
+			Matrix rotationMatrix = Matrix.CreateRotationY(rotationX);
+            //rotationMatrix += Matrix.CreateRotationX(rotationY);
 			Vector3 lookAtOffset = Vector3.Transform(
 				baseCameraReference,
 				rotationMatrix);
@@ -87,17 +102,18 @@ namespace MazeGame
 			needViewResync = true;
 		}
 		
-		public Vector3 PreviewMove(float scale)
+		public Vector3 PreviewMove(Vector3 movement)
 		{
-			Matrix rotate = Matrix.CreateRotationY(rotation);
-			Vector3 forward = new Vector3(0, 0, scale);
-			forward = Vector3.Transform(forward, rotate);
-			return (position + forward);
+			Matrix rotate = Matrix.CreateRotationY(rotationX);
+			//Vector3 forward = new Vector3(0, 0, scale);
+			movement = Vector3.Transform(movement, rotate);
+            
+			return (position + movement);
 		}
 
-		public void MoveForward(float scale)
+		public void MoveForward(Vector3 movement)
 		{
-			MoveTo(PreviewMove(scale), rotation);	
+			MoveTo(PreviewMove(movement), rotationX);	
 		}
 	}
 }

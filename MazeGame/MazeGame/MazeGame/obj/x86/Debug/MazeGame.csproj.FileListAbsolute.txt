@@ -1,0 +1,6 @@
+C:\Users\jarre_000\Documents\GitHub\MazeGame\MazeGame\MazeGame\MazeGame\bin\x86\Debug\MazeGame.exe
+C:\Users\jarre_000\Documents\GitHub\MazeGame\MazeGame\MazeGame\MazeGame\bin\x86\Debug\MazeGame.pdb
+C:\Users\jarre_000\Documents\GitHub\MazeGame\MazeGame\MazeGame\MazeGame\obj\x86\Debug\MazeGame.csprojResolveAssemblyReference.cache
+C:\Users\jarre_000\Documents\GitHub\MazeGame\MazeGame\MazeGame\MazeGame\obj\x86\Debug\Microsoft.Xna.Framework.RuntimeProfile.txt
+C:\Users\jarre_000\Documents\GitHub\MazeGame\MazeGame\MazeGame\MazeGame\obj\x86\Debug\MazeGame.exe
+C:\Users\jarre_000\Documents\GitHub\MazeGame\MazeGame\MazeGame\MazeGame\obj\x86\Debug\MazeGame.pdb

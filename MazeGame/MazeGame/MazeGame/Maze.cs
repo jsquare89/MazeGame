@@ -23,33 +23,32 @@ namespace MazeGame
 
 		VertexBuffer wallBuffer;
 		Vector3[] wallPoints = new Vector3[8];
-		Color[] wallColors = new Color[4] { Color.Red, Color.Orange, Color.Red, Color.Orange };
+		Color[] wallColors = new Color[4] { Color.Red, Color.Orange, Color.Blue, Color.Purple };
+
 
 		public Maze(GraphicsDevice device)
 		{
-			this.device = device;
-			
-			BuildFloorBuffer();
+            this.device = device;
 
-			for ( int x = 0 ; x < MAZE_WIDTH ; x++ )
-			{
-				for ( int z = 0 ; z < MAZE_HEIGHT ; z++ )
-				{
-					MazeCells[x, z] = new MazeCell();
-				}
-			}
-			GenerateMaze();
+            BuildFloorBuffer();
 
-			wallPoints[0] = new Vector3(0, 1, 0);
-			wallPoints[1] = new Vector3(0, 1, 1);
-			wallPoints[2] = new Vector3(0, 0, 0);
-			wallPoints[3] = new Vector3(0, 0, 1);
-			wallPoints[4] = new Vector3(1, 1, 0);
-			wallPoints[5] = new Vector3(1, 1, 1);
-			wallPoints[6] = new Vector3(1, 0, 0);
-			wallPoints[7] = new Vector3(1, 0, 1);
+            for (int x = 0; x < MAZE_WIDTH; x++)
+                for (int z = 0; z < MAZE_HEIGHT; z++)
+                {
+                    MazeCells[x, z] = new MazeCell();
+                }
+            GenerateMaze();
 
-			BuildWallBuffer();
+            wallPoints[0] = new Vector3(0, 1, 0);
+            wallPoints[1] = new Vector3(0, 1, 1);
+            wallPoints[2] = new Vector3(0, 0, 0);
+            wallPoints[3] = new Vector3(0, 0, 1);
+            wallPoints[4] = new Vector3(1, 1, 0);
+            wallPoints[5] = new Vector3(1, 1, 1);
+            wallPoints[6] = new Vector3(1, 0, 0);
+            wallPoints[7] = new Vector3(1, 0, 1);
+
+            BuildWallBuffer();
 		}
 
 		private void BuildFloorBuffer()
@@ -106,67 +105,110 @@ namespace MazeGame
 
 		public void GenerateMaze()
 		{
-			for ( int x = 0; x < MAZE_WIDTH; x++ )
-			{
-				for ( int z = 0 ; z < MAZE_HEIGHT ; z++ )
-				{
-					MazeCells[x, z].Walls[0] = true;
-					MazeCells[x, z].Walls[1] = true;
-					MazeCells[x, z].Walls[2] = true;
-					MazeCells[x, z].Walls[3] = true;
-					MazeCells[x, z].Visited = false;
-				}
+            for (int x = 0; x < MAZE_WIDTH; x++)
+            {
+                for (int z = 0; z < MAZE_HEIGHT; z++)
+                {
+                    MazeCells[x, z].Walls[0] = true;
+                    MazeCells[x, z].Walls[1] = true;
+                    MazeCells[x, z].Walls[2] = true;
+                    MazeCells[x, z].Walls[3] = true;
+                    MazeCells[x, z].Visited = false;
+                }
+            }
 
-				MazeCells[0, 0].Visited = true;
-				EvaluateCell(new Vector2(0, 0));
-
-
-			}
+            MazeCells[0, 0].Visited = true;
+            EvaluateCell(new Vector2(0, 0));
 		}
 
-		private void EvaluateCell(Vector2 cell)
-		{
-			List<int> neighborCells = new List<int>();
-			neighborCells.Add(0);
-			neighborCells.Add(1);
-			neighborCells.Add(2);
-			neighborCells.Add(3);
+        private BoundingBox BuildBoundingBox(
+                int x,
+                int z,
+                int point1,
+                int point2)
+        {
+            BoundingBox thisBox = new BoundingBox(
+            wallPoints[point1],
+            wallPoints[point2]);
 
-			while (neighborCells.Count > 0)
-			{
-				int pick = rand.Next(0, neighborCells.Count);
-				int selectedNeighbor = neighborCells[pick];
-				neighborCells.RemoveAt(pick);
+            thisBox.Min.X += x;
+            thisBox.Min.Z += z;
+            thisBox.Max.X += x;
+            thisBox.Max.Z += z;
 
-				Vector2 neighbor = cell;
+            thisBox.Min.X -= 0.1f;
+            thisBox.Min.Z -= 0.1f;
+            thisBox.Max.X += 0.1f;
+            thisBox.Max.Z += 0.1f;
+            return thisBox;
+        }
 
-				switch (selectedNeighbor)
-				{
-					case 0: neighbor += new Vector2(0, -1);
-						break;
-					case 1: neighbor += new Vector2(1, 0);
-						break;
-					case 2: neighbor += new Vector2(0, 1);
-						break;
-					case 3: neighbor += new Vector2(-1, 0);
-						break;
-				}
+        public List<BoundingBox> GetBoundsForCell(int x, int z)
+        {
+            List<BoundingBox> boxes = new List<BoundingBox>();
+            if (MazeCells[x, z].Walls[0])
+                boxes.Add(BuildBoundingBox(x, z, 2, 4));
+            if (MazeCells[x, z].Walls[1])
+                boxes.Add(BuildBoundingBox(x, z, 6, 5));
+            if (MazeCells[x, z].Walls[2])
+                boxes.Add(BuildBoundingBox(x, z, 3, 5));
+            if (MazeCells[x, z].Walls[3])
+                boxes.Add(BuildBoundingBox(x, z, 2, 1));
+            return boxes;
+        }
 
-				if ( (neighbor.X >= 0) &&
-					(neighbor.X < MAZE_WIDTH) &&
-					(neighbor.Y >= 0) &&
-					(neighbor.Y < MAZE_HEIGHT) )
-				{
-					if ( !MazeCells[ (int)neighbor.X, (int)neighbor.Y ].Visited )
-					{
-						MazeCells[ (int)neighbor.X, (int)neighbor.Y].Visited = true;
-						MazeCells[ (int)cell.X, (int)cell.Y].Walls[selectedNeighbor] = false;
-						MazeCells[ (int)neighbor.X, (int)neighbor.Y].Walls[(selectedNeighbor + 2) % 4] = false;
-						EvaluateCell(neighbor);
-					}
-				}
-			}
-		}
+
+        private void EvaluateCell(Vector2 cell)
+        {
+            List<int> neighborCells = new List<int>();
+            neighborCells.Add(0);
+            neighborCells.Add(1);
+            neighborCells.Add(2);
+            neighborCells.Add(3);
+
+            while (neighborCells.Count > 0)
+            {
+                int pick = rand.Next(0, neighborCells.Count);
+                int selectedNeighbor = neighborCells[pick];
+                neighborCells.RemoveAt(pick);
+
+                Vector2 neighbor = cell;
+
+                switch (selectedNeighbor)
+                {
+                    case 0: neighbor += new Vector2(0, -1);
+                        break;
+                    case 1: neighbor += new Vector2(1, 0);
+                        break;
+                    case 2: neighbor += new Vector2(0, 1);
+                        break;
+                    case 3: neighbor += new Vector2(-1, 0);
+                        break;
+                }
+
+                if ((neighbor.X >= 0) &&
+                    (neighbor.X < MAZE_WIDTH) &&
+                    (neighbor.Y >= 0) &&
+                    (neighbor.Y < MAZE_HEIGHT))
+                {
+                    if (!MazeCells[(int)neighbor.X, (int)neighbor.Y].Visited)
+                    {
+                        MazeCells[
+                            (int)neighbor.X,
+                            (int)neighbor.Y].Visited = true;
+                        MazeCells[
+                            (int)cell.X,
+                            (int)cell.Y].Walls[selectedNeighbor] = false;
+                        MazeCells[
+                            (int)neighbor.X,
+                            (int)neighbor.Y].Walls[
+                            (selectedNeighbor + 2) % 4] = false;
+                        EvaluateCell(neighbor);
+                    }
+                }
+
+            }
+        }
 
 		private void BuildWallBuffer()
 		{
@@ -262,6 +304,10 @@ namespace MazeGame
 					PrimitiveType.TriangleList,
 					0,
 					wallBuffer.VertexCount / 3);
+
+                
+
+                
 			}
 		}
 	}
