@@ -19,7 +19,14 @@ namespace MazeGame
 		private Matrix cachedViewMatrix;
 
         // used for zoom function
-        float scale;
+        float zoomFOV;
+        float scale = 0.01f;
+        const float MIN_ZOOM = MathHelper.PiOver4;
+        const float MAX_ZOOM = MathHelper.Pi/6;
+
+        float aspectRatio;
+        float nearClip;
+        float farClip;
 
 		public Matrix Projection
 		{
@@ -80,12 +87,17 @@ namespace MazeGame
 
 		public Camera(Vector3 position, float rotation, float aspectRatio, float nearClip, float farClip) {
 			Projection = Matrix.CreatePerspectiveFieldOfView(
-				MathHelper.PiOver4,
+				MIN_ZOOM,
 				aspectRatio,
 				nearClip,
 				farClip);
 			MoveTo(position, rotation);
 
+            this.aspectRatio = aspectRatio;
+            this.nearClip = nearClip;
+            this.farClip = farClip;
+            zoomFOV = MIN_ZOOM;
+            rotationX = rotation;
             initialPosition = position;
             initialRotation = rotation;
 		}
@@ -147,5 +159,40 @@ namespace MazeGame
         {
             MoveTo(initialPosition, initialRotation);
         }
-	}
+
+        /// <summary>
+        /// Changes the camera's field of view to zoom in
+        /// </summary>
+        public void zoomIn()
+        {
+            if (zoomFOV >= MAX_ZOOM)
+            {
+                zoomFOV = zoomFOV - scale;
+                Projection = Matrix.CreatePerspectiveFieldOfView(
+                    zoomFOV,
+                    aspectRatio,
+                    nearClip,
+                    farClip);
+                MoveTo(position, rotationX);
+            }
+        }
+
+        /// <summary>
+        /// Changes the camera's field of view to zoom out
+        /// </summary>
+        public void zoomOut()
+        {
+            if (zoomFOV <= MIN_ZOOM)
+            {
+                zoomFOV = zoomFOV + scale;
+                Projection = Matrix.CreatePerspectiveFieldOfView(
+                    zoomFOV,
+                    aspectRatio,
+                    nearClip,
+                    farClip);
+                MoveTo(position, rotationX);
+            }
+        }   
+        
+    }
 }

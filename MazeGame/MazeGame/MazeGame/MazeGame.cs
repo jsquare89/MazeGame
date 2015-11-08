@@ -30,7 +30,6 @@ namespace MazeGame
         KeyboardState previousKeyboardState;
         GamePadState previousGamePadState;
 
-        bool zoom = false;
         bool fog = false;
         bool collision;
         bool night = false;
@@ -137,8 +136,7 @@ namespace MazeGame
             moveAmount = Vector3.Zero;
 
             // Move Forward
-            if (currentKeyboardState.IsKeyDown(Keys.Up) ||
-                currentKeyboardState.IsKeyDown(Keys.W) ||
+            if (currentKeyboardState.IsKeyDown(Keys.W) ||
                 currentGamePadState.IsButtonDown(Buttons.LeftThumbstickUp))
             {
                 //camera.MoveForward(moveScale * elapsed);
@@ -146,8 +144,7 @@ namespace MazeGame
             }
 
             // Move Backward
-            if (currentKeyboardState.IsKeyDown(Keys.Down) ||
-                currentKeyboardState.IsKeyDown(Keys.S) ||
+            if (currentKeyboardState.IsKeyDown(Keys.S) ||
                 currentGamePadState.IsButtonDown(Buttons.LeftThumbstickDown))
             {
                 //camera.MoveForward(-moveScale * elapsed);
@@ -155,8 +152,7 @@ namespace MazeGame
             }
 
             // Strafe Left
-            if (currentKeyboardState.IsKeyDown(Keys.Left) ||
-                currentKeyboardState.IsKeyDown(Keys.A) ||
+            if (currentKeyboardState.IsKeyDown(Keys.A) ||
                 currentGamePadState.IsButtonDown(Buttons.LeftThumbstickLeft))
             {
                 moveAmount.X = moveScale * elapsed;
@@ -165,8 +161,7 @@ namespace MazeGame
             }
 
             // Strafe Right
-            if (currentKeyboardState.IsKeyDown(Keys.Right) ||
-                currentKeyboardState.IsKeyDown(Keys.D) ||
+            if (currentKeyboardState.IsKeyDown(Keys.D) ||
                 currentGamePadState.IsButtonDown(Buttons.LeftThumbstickRight))
             {
                 moveAmount.X = -moveScale * elapsed;
@@ -205,8 +200,8 @@ namespace MazeGame
             }  
        
             // toggle Fog on/off
-            if( (previousKeyboardState.IsKeyDown(Keys.Q) &&
-                currentKeyboardState.IsKeyUp(Keys.Q)) ||
+            if( (previousKeyboardState.IsKeyDown(Keys.F) &&
+                currentKeyboardState.IsKeyUp(Keys.F)) ||
                 (previousGamePadState.IsButtonDown(Buttons.X) &&
                 currentGamePadState.IsButtonUp(Buttons.X)))
             {
@@ -233,12 +228,18 @@ namespace MazeGame
                 collision = !collision;
             }
 
-            // toggle Zoom on/off
-            if (currentKeyboardState.IsKeyDown(Keys.F) ||
-                currentGamePadState.IsButtonDown(Buttons.RightStick))
+            // toggle Zoom in
+            if (currentKeyboardState.IsKeyDown(Keys.Q) ||
+                currentGamePadState.IsButtonDown(Buttons.RightTrigger))
             {
-                zoom = !zoom;
-                
+                camera.zoomIn();
+            }
+
+            // toggle out
+            if (currentKeyboardState.IsKeyDown(Keys.Z) ||
+                currentGamePadState.IsButtonDown(Buttons.LeftTrigger))
+            {
+                camera.zoomOut();
             }
 
             // toggle Night/Day
