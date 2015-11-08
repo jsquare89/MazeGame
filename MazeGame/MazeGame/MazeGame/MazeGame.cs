@@ -22,6 +22,7 @@ namespace MazeGame
 		Camera camera;
 		Maze maze;
 		BasicEffect effect;
+		BasicEffect wallEffect;
 
         Vector3 moveAmount = Vector3.Zero;
 		float moveScale = 1.5f;
@@ -63,6 +64,7 @@ namespace MazeGame
 				0.05f,
 				100f);
 			effect = new BasicEffect(GraphicsDevice);
+			wallEffect = new BasicEffect(GraphicsDevice);
 			maze = new Maze(GraphicsDevice);
             collision = true;
 			base.Initialize();
@@ -78,6 +80,7 @@ namespace MazeGame
 			spriteBatch = new SpriteBatch( GraphicsDevice );
 
 			// TODO: use this.Content to load your game content here
+			maze.LoadContent(Content);
 		}
 
 		/// <summary>
@@ -267,7 +270,7 @@ namespace MazeGame
 		{
 			GraphicsDevice.Clear( Color.CornflowerBlue );
 
-			maze.Draw(camera, effect);         
+			maze.Draw(camera, effect, wallEffect);
 
 			base.Draw( gameTime );
 		}
