@@ -22,17 +22,15 @@ namespace MazeGame
 		Camera camera;
 		Maze maze;
 		BasicEffect effect;
+        Effect ambientEffect;
 
-        Vector3 moveAmount = Vector3.Zero;
-		float moveScale = 1.5f;
-		float rotateScale = MathHelper.PiOver2;
-
+        // Input handling
         KeyboardState previousKeyboardState;
         GamePadState previousGamePadState;
 
-        bool fog = false;
-        bool collision;
-        bool night = false;
+        // Feature handling
+        bool fog;
+        bool ambient;
 
 		public MazeGame()
 		{
@@ -41,10 +39,7 @@ namespace MazeGame
 		}
 
 		/// <summary>
-		/// Allows the game to perform any initialization it needs to before starting to run.
-		/// This is where it can query for any required services and load any non-graphic
-		/// related content.  Calling base.Initialize will enumerate through any components
-		/// and initialize them as well.
+		/// Initialize game variables/objects
 		/// </summary>
 		protected override void Initialize()
 		{
@@ -55,15 +50,22 @@ namespace MazeGame
             graphics.IsFullScreen = false;
             graphics.ApplyChanges();
 
+            // Setup camera
 			camera = new Camera(
 				new Vector3(0.5f, 0.5f, 0.5f),
 				0,
 				GraphicsDevice.Viewport.AspectRatio,
 				0.05f,
 				100f);
+
+            // Other variables to initialize
 			effect = new BasicEffect(GraphicsDevice);
-			maze = new Maze(GraphicsDevice);
-            collision = true;
+            maze = new Maze(GraphicsDevice);
+
+            // Set default feature states
+            fog = false;
+            ambient = true;
+
 			base.Initialize();
 		}
 
@@ -76,7 +78,8 @@ namespace MazeGame
 			// Create a new SpriteBatch, which can be used to draw textures.
 			spriteBatch = new SpriteBatch( GraphicsDevice );
 
-			// TODO: use this.Content to load your game content here
+            ambientEffect = Content.Load<Effect>("Ambient");
+            
 		}
 
 		/// <summary>
@@ -95,117 +98,53 @@ namespace MazeGame
 		/// <param name="gameTime">Provides a snapshot of timing values.</param>
 		protected override void Update( GameTime gameTime )
 		{
-            
-            HandleInput(gameTime);
 
-			if (moveAmount.Z != 0 || moveAmount.X !=0)
-			{
-				Vector3 newLocation = camera.PreviewMove(moveAmount);
-				bool moveOk = true;
+            // Handle input for camera movement and feature toggle
+            KeyboardState currentKeyboardState = Keyboard.GetState();
+            GamePadState currentGamePadState = GamePad.GetState(PlayerIndex.One);
+            camera.initializeInput();
+            camera.HandleKeyboadInput(currentKeyboardState, gameTime);
+            camera.HandleGamePadInput(currentGamePadState, gameTime);
+            HandleInput(currentKeyboardState, currentGamePadState, gameTime);
 
-				if (newLocation.X < 0 || newLocation.X > Maze.MAZE_WIDTH)
-					moveOk = false;
-				if (newLocation.Z < 0 || newLocation.Z > Maze.MAZE_HEIGHT)
-					moveOk = false;
-
-                if(collision)
-                foreach (BoundingBox box in maze.GetBoundsForCell((int)newLocation.X, (int)newLocation.Z))
-                {
-                    if (box.Contains(newLocation) == ContainmentType.Contains)
-                        moveOk = false;
-                }
-
-				if (moveOk)
-					camera.MoveForward(moveAmount);
-			}
+            // update camera movement and collision based on input
+            camera.Update(maze);
 
 			base.Update( gameTime );
 		}
 
-        private void HandleInput(GameTime gameTime)
+        private void HandleInput(KeyboardState currentKeyboardState, GamePadState currentGamePadState,GameTime gameTime)
         {
             // Allows the game to exit
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed ||
-                Keyboard.GetState().IsKeyDown(Keys.Escape))
+            if (currentGamePadState.Buttons.Back == ButtonState.Pressed ||
+                currentKeyboardState.IsKeyDown(Keys.Escape))
                 this.Exit();
 
-            // Handle Input
-            float elapsed = (float)gameTime.ElapsedGameTime.TotalSeconds;
-            KeyboardState currentKeyboardState = Keyboard.GetState();
-            GamePadState currentGamePadState = GamePad.GetState(PlayerIndex.One);
-            moveAmount = Vector3.Zero;
+            // toggle features on keyboard/gamepad input
+            FogToggle(currentKeyboardState, currentGamePadState);
+            AmbientToggle(currentKeyboardState, currentGamePadState);
 
-            // Move Forward
-            if (currentKeyboardState.IsKeyDown(Keys.W) ||
-                currentGamePadState.IsButtonDown(Buttons.LeftThumbstickUp))
-            {
-                //camera.MoveForward(moveScale * elapsed);
-                moveAmount.Z = moveScale * elapsed;
-            }
+            // save previous states
+            previousKeyboardState = currentKeyboardState;
+            previousGamePadState = currentGamePadState;
+            
+        }
 
-            // Move Backward
-            if (currentKeyboardState.IsKeyDown(Keys.S) ||
-                currentGamePadState.IsButtonDown(Buttons.LeftThumbstickDown))
-            {
-                //camera.MoveForward(-moveScale * elapsed);
-                moveAmount.Z = -moveScale * elapsed;
-            }
-
-            // Strafe Left
-            if (currentKeyboardState.IsKeyDown(Keys.A) ||
-                currentGamePadState.IsButtonDown(Buttons.LeftThumbstickLeft))
-            {
-                moveAmount.X = moveScale * elapsed;
-                //camera.Rotation = MathHelper.WrapAngle(
-                //camera.Rotation + (rotateScale * elapsed));
-            }
-
-            // Strafe Right
-            if (currentKeyboardState.IsKeyDown(Keys.D) ||
-                currentGamePadState.IsButtonDown(Buttons.LeftThumbstickRight))
-            {
-                moveAmount.X = -moveScale * elapsed;
-                //camera.Rotation = MathHelper.WrapAngle(
-                //	camera.Rotation - (rotateScale * elapsed));
-            }
-
-            // Look Left
-            if (currentGamePadState.IsButtonDown(Buttons.RightThumbstickLeft) ||
-                currentKeyboardState.IsKeyDown(Keys.Left))
-            {
-                camera.RotationX = MathHelper.WrapAngle(
-                    camera.RotationX + (rotateScale * elapsed));
-            }
-
-            // Look Right
-            if (currentGamePadState.IsButtonDown(Buttons.RightThumbstickRight) ||
-                currentKeyboardState.IsKeyDown(Keys.Right))
-            {
-                camera.RotationX = MathHelper.WrapAngle(
-                    camera.RotationX - (rotateScale * elapsed));
-            }
-
-            // Look Up
-            if (currentGamePadState.IsButtonDown(Buttons.RightThumbstickUp))
-            {
-                camera.RotationY = MathHelper.WrapAngle(
-                    camera.RotationY + (rotateScale * elapsed));
-            }
-
-            // Look Down
-            if (currentGamePadState.IsButtonDown(Buttons.RightThumbstickDown))
-            {
-                camera.RotationY = MathHelper.WrapAngle(
-                    camera.RotationY - (rotateScale * elapsed));
-            }  
-       
-            // toggle Fog on/off
-            if( (previousKeyboardState.IsKeyDown(Keys.F) &&
+        /// <summary>
+        /// Handles Toggle Fog on and off 
+        /// </summary>
+        /// <param name="currentKeyboardState">Current Keyboard state</param>
+        /// <param name="currentGamePadState">Current GamePad state</param>
+        protected void FogToggle(KeyboardState currentKeyboardState, GamePadState currentGamePadState)
+        {
+            
+            if ((previousKeyboardState.IsKeyDown(Keys.F) &&
                 currentKeyboardState.IsKeyUp(Keys.F)) ||
                 (previousGamePadState.IsButtonDown(Buttons.X) &&
                 currentGamePadState.IsButtonUp(Buttons.X)))
             {
                 fog = !fog;
+                // toggle Fog on/off
                 if (fog)
                 {
                     effect.FogEnabled = true;
@@ -218,46 +157,16 @@ namespace MazeGame
                     effect.FogEnabled = false;
                 }
             }
-            
-            // toggle Collision on/off - using C instead of W
-            if ((previousKeyboardState.IsKeyDown(Keys.C) &&
-                currentKeyboardState.IsKeyUp(Keys.C)) ||
-                (previousGamePadState.IsButtonDown(Buttons.Y) &&
-                currentGamePadState.IsButtonUp(Buttons.Y)))
-            {
-                collision = !collision;
-            }
+        }
 
-            // toggle Zoom in
-            if (currentKeyboardState.IsKeyDown(Keys.Q) ||
-                currentGamePadState.IsButtonDown(Buttons.RightTrigger))
-            {
-                camera.zoomIn();
-            }
-
-            // toggle out
-            if (currentKeyboardState.IsKeyDown(Keys.Z) ||
-                currentGamePadState.IsButtonDown(Buttons.LeftTrigger))
-            {
-                camera.zoomOut();
-            }
-
-            // toggle Night/Day
+        protected void AmbientToggle(KeyboardState currentKeyboardState, GamePadState currentGamePadState)
+        {
+            // toggle Ambient - Night/Day effect
             if (currentKeyboardState.IsKeyDown(Keys.E) ||
-                currentGamePadState.IsButtonDown(Buttons.B))
+                currentGamePadState.IsButtonDown(Buttons.RightShoulder))
             {
-                night = !night;
+                ambient = !ambient;
             }
-
-            // Reset position to start position
-            if (currentKeyboardState.IsKeyDown(Keys.Home) ||
-                currentGamePadState.IsButtonDown(Buttons.Start))
-            {
-                camera.resetPosition();
-            }
-
-            previousKeyboardState = currentKeyboardState;
-            previousGamePadState = currentGamePadState;
         }
 
 		/// <summary>

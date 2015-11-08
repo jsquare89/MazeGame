@@ -287,12 +287,15 @@ namespace MazeGame
 		public void Draw( Camera camera, BasicEffect effect )
 		{
 
-			effect.VertexColorEnabled = true;
+            effect.VertexColorEnabled = true;
             effect.World = Matrix.Identity;
-			effect.View = camera.View;
-			effect.Projection = camera.Projection;
+            effect.View = camera.View;
+            effect.Projection = camera.Projection;
+            //effect.AmbientLightColor = Color.Blue.ToVector3();
 
-                       
+            //effect.Parameters["World"].SetValue(Matrix.Identity);
+            //effect.Parameters["View"].SetValue(camera.View);
+            //effect.Parameters["Projection"].SetValue(camera.Projection);
 
 			foreach (EffectPass pass in effect.CurrentTechnique.Passes)
 			{
