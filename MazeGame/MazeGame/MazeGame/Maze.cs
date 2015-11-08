@@ -286,14 +286,18 @@ namespace MazeGame
 
 		public void Draw( Camera camera, BasicEffect effect )
 		{
+
 			effect.VertexColorEnabled = true;
-			effect.World = Matrix.Identity;
+            effect.World = Matrix.Identity;
 			effect.View = camera.View;
 			effect.Projection = camera.Projection;
+
+                       
 
 			foreach (EffectPass pass in effect.CurrentTechnique.Passes)
 			{
 				pass.Apply();
+               
 				device.SetVertexBuffer(floorBuffer);
 				device.DrawPrimitives(
 					PrimitiveType.TriangleList,
@@ -303,12 +307,9 @@ namespace MazeGame
 				device.DrawPrimitives(
 					PrimitiveType.TriangleList,
 					0,
-					wallBuffer.VertexCount / 3);
-
-                
-
-                
+					wallBuffer.VertexCount / 3);                
 			}
+            
 		}
 	}
 }
