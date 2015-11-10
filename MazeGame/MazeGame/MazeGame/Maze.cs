@@ -16,15 +16,19 @@ namespace MazeGame
 		GraphicsDevice device;
 
 		VertexBuffer floorBuffer;
+		VertexPositionNormalTexture[] floorVertices;
+		Texture2D floorTexture;
+		BasicEffect floorEffect;
 
 		Color[] floorColors = new Color[2] { Color.White, Color.Gray };
 
 		private Random rand = new Random();
 		public MazeCell[,] MazeCells = new MazeCell[MAZE_WIDTH, MAZE_HEIGHT];
 
-		VertexPositionNormalTexture[] wallVertices;
+		VertexPositionNormalTexture[][] wallVertices = new VertexPositionNormalTexture[4][];
 		Vector3[] wallPoints = new Vector3[8];
-		Texture2D wallTexture;
+		Texture2D[] wallTextures = new Texture2D[4];
+		BasicEffect[] wallEffects = new BasicEffect[4];
 
 
 		public Maze(GraphicsDevice device)
@@ -49,18 +53,29 @@ namespace MazeGame
             wallPoints[6] = new Vector3(1, 0, 0);
             wallPoints[7] = new Vector3(1, 0, 1);
 
+			floorEffect = new BasicEffect(device);
+			wallEffects = new BasicEffect[]{
+				new BasicEffect(device), 
+				new BasicEffect(device), 
+				new BasicEffect(device), 
+				new BasicEffect(device)};
+
             BuildWallBuffer();
 		}
 
 		public void LoadContent(ContentManager content)
 		{
-			wallTexture = content.Load<Texture2D>("wall");
+			floorTexture = content.Load<Texture2D>("floor");
+			wallTextures[0] = content.Load<Texture2D>("wall");
+			wallTextures[1] = content.Load<Texture2D>("wall2");
+			wallTextures[2] = content.Load<Texture2D>("wall3");
+			wallTextures[3] = content.Load<Texture2D>("wall4");
 		}
 
 		private void BuildFloorBuffer()
 		{
-			List<VertexPositionColor> vertexList = 
-				new List<VertexPositionColor>();
+			List<VertexPositionNormalTexture> vertexList = 
+				new List<VertexPositionNormalTexture>();
 
 			int counter = 0;
 
@@ -69,7 +84,7 @@ namespace MazeGame
 				counter++;
 				for (int z = 0; z < MAZE_HEIGHT; z++) {
 					counter++; 
-					foreach ( VertexPositionColor vertex in
+					foreach ( VertexPositionNormalTexture vertex in
 						FloorTile( x, z, floorColors[ counter % 2 ] ) )
 					{
 						vertexList.Add(vertex);
@@ -77,34 +92,28 @@ namespace MazeGame
 				}
 			}
 
-			floorBuffer = new VertexBuffer(
-				device,
-				VertexPositionColor.VertexDeclaration,
-				vertexList.Count,
-				BufferUsage.WriteOnly);
-
-			floorBuffer.SetData<VertexPositionColor>(vertexList.ToArray());
+			floorVertices = vertexList.ToArray();
 		}
 
-		private List<VertexPositionColor> FloorTile(
+		private List<VertexPositionNormalTexture> FloorTile(
 			int xOffset,
 			int zOffset,
 			Color tileColor)
 		{
-			List<VertexPositionColor> vList = new List<VertexPositionColor>();
-			vList.Add(new VertexPositionColor(
-				new Vector3(0 + xOffset, 0, 0 + zOffset), tileColor));
-			vList.Add(new VertexPositionColor(
-				new Vector3(1 + xOffset, 0, 0 + zOffset), tileColor));
-			vList.Add(new VertexPositionColor(
-				new Vector3(0 + xOffset, 0, 1 + zOffset), tileColor));
+			List<VertexPositionNormalTexture> vList = new List<VertexPositionNormalTexture>();
+			vList.Add(new VertexPositionNormalTexture(
+				new Vector3(0 + xOffset, 0, 0 + zOffset), Vector3.UnitY, new Vector2(0, 0)));
+			vList.Add(new VertexPositionNormalTexture(
+				new Vector3(1 + xOffset, 0, 0 + zOffset), Vector3.UnitY, new Vector2(1, 0)));
+			vList.Add(new VertexPositionNormalTexture(
+				new Vector3(0 + xOffset, 0, 1 + zOffset), Vector3.UnitY, new Vector2(0, 1)));
 
-			vList.Add(new VertexPositionColor(
-				new Vector3(1 + xOffset, 0, 0 + zOffset), tileColor));
-			vList.Add(new VertexPositionColor(
-				new Vector3(1 + xOffset, 0, 1 + zOffset), tileColor));
-			vList.Add(new VertexPositionColor(
-				new Vector3(0 + xOffset, 0, 1 + zOffset), tileColor));
+			vList.Add(new VertexPositionNormalTexture(
+				new Vector3(1 + xOffset, 0, 0 + zOffset), Vector3.UnitY, new Vector2(1, 0)));
+			vList.Add(new VertexPositionNormalTexture(
+				new Vector3(1 + xOffset, 0, 1 + zOffset), Vector3.UnitY, new Vector2(1, 1)));
+			vList.Add(new VertexPositionNormalTexture(
+				new Vector3(0 + xOffset, 0, 1 + zOffset), Vector3.UnitY, new Vector2(0, 1)));
 
 			return vList;
 		}
@@ -218,66 +227,66 @@ namespace MazeGame
 
 		private void BuildWallBuffer()
 		{
-			List<VertexPositionNormalTexture> wallVertexList = new List<VertexPositionNormalTexture>();
+			List<VertexPositionNormalTexture>[] wallVertexLists = new List<VertexPositionNormalTexture>[4] {
+				new List<VertexPositionNormalTexture>(),
+				new List<VertexPositionNormalTexture>(),
+				new List<VertexPositionNormalTexture>(),
+				new List<VertexPositionNormalTexture>()};
 			for ( int x = 0 ; x < MAZE_WIDTH ; x++ )
 			{
 				for ( int z = 0 ; z < MAZE_HEIGHT ; z++ )
 				{
-					foreach ( VertexPositionNormalTexture vertex in BuildMazeWall( x, z ) )
-					{
-						wallVertexList.Add(vertex);
-					}
+					BuildMazeWall( x, z, wallVertexLists );
 				}
 			}
 
-			wallVertices = wallVertexList.ToArray();
+			wallVertices[0] = wallVertexLists[0].ToArray();
+			wallVertices[1] = wallVertexLists[1].ToArray();
+			wallVertices[2] = wallVertexLists[2].ToArray();
+			wallVertices[3] = wallVertexLists[3].ToArray();
 		}
 
-		private List<VertexPositionNormalTexture> BuildMazeWall( int x, int z )
+		private void BuildMazeWall( int x, int z, List<VertexPositionNormalTexture>[] triangleLists)
 		{
-			List<VertexPositionNormalTexture> triangles = new List<VertexPositionNormalTexture>();
-
 			if (MazeCells[x, z].Walls[0])
 			{
-				triangles.Add(CalcPoint(0, x, z, Vector3.UnitZ, new Vector2(0, 1)));
-				triangles.Add(CalcPoint(4, x, z, Vector3.UnitZ, new Vector2(1, 1)));
-				triangles.Add(CalcPoint(2, x, z, Vector3.UnitZ, new Vector2(0, 0)));
-				triangles.Add(CalcPoint(4, x, z, Vector3.UnitZ, new Vector2(1, 1)));
-				triangles.Add(CalcPoint(6, x, z, Vector3.UnitZ, new Vector2(1, 0)));
-				triangles.Add(CalcPoint(2, x, z, Vector3.UnitZ, new Vector2(0, 0)));
+				triangleLists[0].Add(CalcPoint(0, x, z, Vector3.UnitZ, new Vector2(0, 1)));
+				triangleLists[0].Add(CalcPoint(4, x, z, Vector3.UnitZ, new Vector2(1, 1)));
+				triangleLists[0].Add(CalcPoint(2, x, z, Vector3.UnitZ, new Vector2(0, 0)));
+				triangleLists[0].Add(CalcPoint(4, x, z, Vector3.UnitZ, new Vector2(1, 1)));
+				triangleLists[0].Add(CalcPoint(6, x, z, Vector3.UnitZ, new Vector2(1, 0)));
+				triangleLists[0].Add(CalcPoint(2, x, z, Vector3.UnitZ, new Vector2(0, 0)));
 			}
 
 			if (MazeCells[x, z].Walls[1])
 			{
-				triangles.Add(CalcPoint(4, x, z, -Vector3.UnitX, new Vector2(0, 1)));
-				triangles.Add(CalcPoint(5, x, z, -Vector3.UnitX, new Vector2(1, 1)));
-				triangles.Add(CalcPoint(6, x, z, -Vector3.UnitX, new Vector2(0, 0)));
-				triangles.Add(CalcPoint(5, x, z, -Vector3.UnitX, new Vector2(1, 1)));
-				triangles.Add(CalcPoint(7, x, z, -Vector3.UnitX, new Vector2(1, 0)));
-				triangles.Add(CalcPoint(6, x, z, -Vector3.UnitX, new Vector2(0, 0)));
+				triangleLists[1].Add(CalcPoint(4, x, z, -Vector3.UnitX, new Vector2(0, 1)));
+				triangleLists[1].Add(CalcPoint(5, x, z, -Vector3.UnitX, new Vector2(1, 1)));
+				triangleLists[1].Add(CalcPoint(6, x, z, -Vector3.UnitX, new Vector2(0, 0)));
+				triangleLists[1].Add(CalcPoint(5, x, z, -Vector3.UnitX, new Vector2(1, 1)));
+				triangleLists[1].Add(CalcPoint(7, x, z, -Vector3.UnitX, new Vector2(1, 0)));
+				triangleLists[1].Add(CalcPoint(6, x, z, -Vector3.UnitX, new Vector2(0, 0)));
 			}
 
 			if (MazeCells[x, z].Walls[2])
 			{
-				triangles.Add(CalcPoint(5, x, z, -Vector3.UnitZ, new Vector2(0, 1)));
-				triangles.Add(CalcPoint(1, x, z, -Vector3.UnitZ, new Vector2(1, 1)));
-				triangles.Add(CalcPoint(7, x, z, -Vector3.UnitZ, new Vector2(0, 0)));
-				triangles.Add(CalcPoint(1, x, z, -Vector3.UnitZ, new Vector2(1, 1)));
-				triangles.Add(CalcPoint(3, x, z, -Vector3.UnitZ, new Vector2(1, 0)));
-				triangles.Add(CalcPoint(7, x, z, -Vector3.UnitZ, new Vector2(0, 0)));
+				triangleLists[2].Add(CalcPoint(5, x, z, -Vector3.UnitZ, new Vector2(0, 1)));
+				triangleLists[2].Add(CalcPoint(1, x, z, -Vector3.UnitZ, new Vector2(1, 1)));
+				triangleLists[2].Add(CalcPoint(7, x, z, -Vector3.UnitZ, new Vector2(0, 0)));
+				triangleLists[2].Add(CalcPoint(1, x, z, -Vector3.UnitZ, new Vector2(1, 1)));
+				triangleLists[2].Add(CalcPoint(3, x, z, -Vector3.UnitZ, new Vector2(1, 0)));
+				triangleLists[2].Add(CalcPoint(7, x, z, -Vector3.UnitZ, new Vector2(0, 0)));
 			}
 
 			if (MazeCells[x, z].Walls[3])
 			{
-				triangles.Add(CalcPoint(1, x, z, Vector3.UnitX, new Vector2(0, 1)));
-				triangles.Add(CalcPoint(0, x, z, Vector3.UnitX, new Vector2(1, 1)));
-				triangles.Add(CalcPoint(3, x, z, Vector3.UnitX, new Vector2(0, 0)));
-				triangles.Add(CalcPoint(0, x, z, Vector3.UnitX, new Vector2(1, 1)));
-				triangles.Add(CalcPoint(2, x, z, Vector3.UnitX, new Vector2(1, 0)));
-				triangles.Add(CalcPoint(3, x, z, Vector3.UnitX, new Vector2(0, 0)));
+				triangleLists[3].Add(CalcPoint(1, x, z, Vector3.UnitX, new Vector2(0, 1)));
+				triangleLists[3].Add(CalcPoint(0, x, z, Vector3.UnitX, new Vector2(1, 1)));
+				triangleLists[3].Add(CalcPoint(3, x, z, Vector3.UnitX, new Vector2(0, 0)));
+				triangleLists[3].Add(CalcPoint(0, x, z, Vector3.UnitX, new Vector2(1, 1)));
+				triangleLists[3].Add(CalcPoint(2, x, z, Vector3.UnitX, new Vector2(1, 0)));
+				triangleLists[3].Add(CalcPoint(3, x, z, Vector3.UnitX, new Vector2(0, 0)));
 			}
-
-			return triangles;	
 		}
 
 		private VertexPositionNormalTexture CalcPoint( int wallPoint, int xOffset, int zOffset, Vector3 normal, Vector2 textCoords )
@@ -285,40 +294,34 @@ namespace MazeGame
 			return new VertexPositionNormalTexture(wallPoints[wallPoint] + new Vector3(xOffset, 0, zOffset), normal, textCoords);
 		}
 
-		public void Draw( Camera camera, BasicEffect effect, BasicEffect wallEffect )
-		{
-
-			effect.VertexColorEnabled = true;
-            effect.World = Matrix.Identity;
-			effect.View = camera.View;
-			effect.Projection = camera.Projection;
-
-			
-			wallEffect.TextureEnabled = true;
-            wallEffect.Texture = wallTexture;
-            wallEffect.World = Matrix.Identity;
-			wallEffect.View = camera.View;
-			wallEffect.Projection = camera.Projection;
-			
+		public void Draw( Camera camera )
+		{	
 			device.SamplerStates[0] = SamplerState.LinearClamp;
-
-			foreach (EffectPass pass in effect.CurrentTechnique.Passes)
+			floorEffect.TextureEnabled = true;
+			floorEffect.Texture = floorTexture;
+			floorEffect.World = Matrix.Identity;
+			floorEffect.View = camera.View;
+			floorEffect.Projection = camera.Projection;
+			foreach (EffectPass pass in floorEffect.CurrentTechnique.Passes)
 			{
 				pass.Apply();
-               
-				device.SetVertexBuffer(floorBuffer);
-				device.DrawPrimitives(
-					PrimitiveType.TriangleList,
-					0,
-					floorBuffer.VertexCount / 3);
-			}
-			foreach(EffectPass pass in wallEffect.CurrentTechnique.Passes)
-			{
-				pass.Apply();
-				device.DrawUserPrimitives<VertexPositionNormalTexture>(PrimitiveType.TriangleList, wallVertices, 0, wallVertices.Count() / 3);
+				device.DrawUserPrimitives<VertexPositionNormalTexture>(PrimitiveType.TriangleList, floorVertices, 0, floorVertices.Count() / 3);
 			}
 
-            
+			for ( int i = 0; i < wallEffects.Count(); i++ )
+			{
+				wallEffects[i].TextureEnabled = true;
+				wallEffects[i].Texture = wallTextures[i];
+				wallEffects[i].World = Matrix.Identity;
+				wallEffects[i].View = camera.View;
+				wallEffects[i].Projection = camera.Projection;
+				
+				foreach(EffectPass pass in wallEffects[i].CurrentTechnique.Passes)
+				{
+					pass.Apply();
+					device.DrawUserPrimitives<VertexPositionNormalTexture>(PrimitiveType.TriangleList, wallVertices[i], 0, wallVertices[i].Count() / 3);
+				}
+			}
 		}
 	}
 }

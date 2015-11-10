@@ -64,7 +64,6 @@ namespace MazeGame
 				0.05f,
 				100f);
 			effect = new BasicEffect(GraphicsDevice);
-			wallEffect = new BasicEffect(GraphicsDevice);
 			maze = new Maze(GraphicsDevice);
             collision = true;
 			base.Initialize();
@@ -140,8 +139,7 @@ namespace MazeGame
             moveAmount = Vector3.Zero;
 
             // Move Forward
-            if (currentKeyboardState.IsKeyDown(Keys.Up) ||
-                currentKeyboardState.IsKeyDown(Keys.W) ||
+            if (currentKeyboardState.IsKeyDown(Keys.W) ||
                 currentGamePadState.IsButtonDown(Buttons.LeftThumbstickUp))
             {
                 //camera.MoveForward(moveScale * elapsed);
@@ -149,8 +147,7 @@ namespace MazeGame
             }
 
             // Move Backward
-            if (currentKeyboardState.IsKeyDown(Keys.Down) ||
-                currentKeyboardState.IsKeyDown(Keys.S) ||
+            if (currentKeyboardState.IsKeyDown(Keys.S) ||
                 currentGamePadState.IsButtonDown(Buttons.LeftThumbstickDown))
             {
                 //camera.MoveForward(-moveScale * elapsed);
@@ -158,8 +155,7 @@ namespace MazeGame
             }
 
             // Strafe Left
-            if (currentKeyboardState.IsKeyDown(Keys.Left) ||
-                currentKeyboardState.IsKeyDown(Keys.A) ||
+            if (currentKeyboardState.IsKeyDown(Keys.A) ||
                 currentGamePadState.IsButtonDown(Buttons.LeftThumbstickLeft))
             {
                 moveAmount.X = moveScale * elapsed;
@@ -168,8 +164,7 @@ namespace MazeGame
             }
 
             // Strafe Right
-            if (currentKeyboardState.IsKeyDown(Keys.Right) ||
-                currentKeyboardState.IsKeyDown(Keys.D) ||
+            if (currentKeyboardState.IsKeyDown(Keys.D) ||
                 currentGamePadState.IsButtonDown(Buttons.LeftThumbstickRight))
             {
                 moveAmount.X = -moveScale * elapsed;
@@ -194,14 +189,16 @@ namespace MazeGame
             }
 
             // Look Up
-            if (currentGamePadState.IsButtonDown(Buttons.RightThumbstickUp))
+            if (currentGamePadState.IsButtonDown(Buttons.RightThumbstickUp) ||
+				currentKeyboardState.IsKeyDown(Keys.Up))
             {
                 camera.RotationY = MathHelper.WrapAngle(
                     camera.RotationY + (rotateScale * elapsed));
             }
 
             // Look Down
-            if (currentGamePadState.IsButtonDown(Buttons.RightThumbstickDown))
+            if (currentGamePadState.IsButtonDown(Buttons.RightThumbstickDown) ||
+				currentKeyboardState.IsKeyDown(Keys.Down))
             {
                 camera.RotationY = MathHelper.WrapAngle(
                     camera.RotationY - (rotateScale * elapsed));
@@ -270,7 +267,16 @@ namespace MazeGame
 		{
 			GraphicsDevice.Clear( Color.CornflowerBlue );
 
-			maze.Draw(camera, effect, wallEffect);
+			maze.Draw(camera);
+			
+			effect.VertexColorEnabled = true;
+            effect.World = Matrix.Identity;
+			effect.View = camera.View;
+			effect.Projection = camera.Projection;
+			foreach (EffectPass pass in effect.CurrentTechnique.Passes)
+			{
+				pass.Apply();
+			}
 
 			base.Draw( gameTime );
 		}

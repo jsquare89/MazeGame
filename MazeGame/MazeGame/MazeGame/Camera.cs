@@ -108,8 +108,7 @@ namespace MazeGame
         /// </summary>
 		private void UpdateLookAt()
 		{
-			Matrix rotationMatrix = Matrix.CreateRotationY(rotationX);
-            //rotationMatrix += Matrix.CreateRotationX(rotationY);
+			Matrix rotationMatrix = Matrix.CreateRotationY(rotationX);// * Matrix.CreateRotationX(rotationY);
 			Vector3 lookAtOffset = Vector3.Transform(
 				baseCameraReference,
 				rotationMatrix);
