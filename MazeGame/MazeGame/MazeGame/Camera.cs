@@ -60,7 +60,7 @@ namespace MazeGame
             }
             set
             {
-                rotationY = value;
+                rotationY = MathHelper.Max(-MathHelper.PiOver4, MathHelper.Min(value, MathHelper.PiOver4));
                 UpdateLookAt();
             }
         }
@@ -69,11 +69,15 @@ namespace MazeGame
 		{
 			get
 			{
-				if (needViewResync)
+				if ( needViewResync )
+				{
 					cachedViewMatrix = Matrix.CreateLookAt(
 						Position,
 						lookAt,
 						Vector3.Up);
+					cachedViewMatrix *= Matrix.CreateRotationX(-rotationY);
+				}
+					
 				return cachedViewMatrix;
 			}
 		}
