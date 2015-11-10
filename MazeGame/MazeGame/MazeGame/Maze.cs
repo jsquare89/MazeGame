@@ -294,14 +294,26 @@ namespace MazeGame
 			return new VertexPositionNormalTexture(wallPoints[wallPoint] + new Vector3(xOffset, 0, zOffset), normal, textCoords);
 		}
 
-		public void Draw( Camera camera )
+		public void Draw( Camera camera, BasicEffect effect )
 		{	
 			device.SamplerStates[0] = SamplerState.LinearClamp;
+
 			floorEffect.TextureEnabled = true;
 			floorEffect.Texture = floorTexture;
 			floorEffect.World = Matrix.Identity;
 			floorEffect.View = camera.View;
 			floorEffect.Projection = camera.Projection;
+			if ( effect.FogEnabled )
+			{
+				floorEffect.FogEnabled = true;
+                floorEffect.FogColor = Color.White.ToVector3();
+                floorEffect.FogStart = 0.1f;
+                floorEffect.FogEnd = 5f;
+			}
+			else
+			{
+				floorEffect.FogEnabled = false;
+			}
 			foreach (EffectPass pass in floorEffect.CurrentTechnique.Passes)
 			{
 				pass.Apply();
@@ -315,6 +327,17 @@ namespace MazeGame
 				wallEffects[i].World = Matrix.Identity;
 				wallEffects[i].View = camera.View;
 				wallEffects[i].Projection = camera.Projection;
+				if ( effect.FogEnabled )
+				{
+					wallEffects[i].FogEnabled = true;
+					wallEffects[i].FogColor = Color.White.ToVector3();
+					wallEffects[i].FogStart = 0.1f;
+					wallEffects[i].FogEnd = 5f;
+				}
+				else
+				{
+					wallEffects[i].FogEnabled = false;
+				}
 				
 				foreach(EffectPass pass in wallEffects[i].CurrentTechnique.Passes)
 				{

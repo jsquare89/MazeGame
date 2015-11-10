@@ -8,6 +8,10 @@ namespace MazeGame
 {
     class Camera
 	{
+		private float zoom = 1;
+		private float aspectRatio;
+		private float nearClip;
+		private float farClip;
 		private Vector3 position = Vector3.Zero;
         private Vector3 initialPosition;
         private float initialRotation;
@@ -19,7 +23,22 @@ namespace MazeGame
 		private Matrix cachedViewMatrix;
 
         // used for zoom function
-        float scale;
+		public float Zoom
+		{
+			get
+			{
+				return zoom;
+			}
+			set
+			{
+				zoom = MathHelper.Min(4, MathHelper.Max(1, value));
+				Projection = Matrix.CreatePerspectiveFieldOfView(
+						MathHelper.PiOver4 / Zoom,
+						aspectRatio,
+						nearClip,
+						farClip);
+			}
+		}
 
 		public Matrix Projection
 		{
@@ -84,12 +103,15 @@ namespace MazeGame
 
 		public Camera(Vector3 position, float rotation, float aspectRatio, float nearClip, float farClip) {
 			Projection = Matrix.CreatePerspectiveFieldOfView(
-				MathHelper.PiOver4,
+				MathHelper.PiOver4 / Zoom,
 				aspectRatio,
 				nearClip,
 				farClip);
-			MoveTo(position, rotation);
+			this.aspectRatio = aspectRatio;
+			this.nearClip = nearClip;
+			this.farClip = farClip;
 
+			MoveTo(position, rotation);
             initialPosition = position;
             initialRotation = rotation;
 		}

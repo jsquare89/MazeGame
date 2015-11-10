@@ -22,16 +22,15 @@ namespace MazeGame
 		Camera camera;
 		Maze maze;
 		BasicEffect effect;
-		BasicEffect wallEffect;
 
         Vector3 moveAmount = Vector3.Zero;
 		float moveScale = 1.5f;
 		float rotateScale = MathHelper.PiOver2;
+		float zoomScale = 1.5f;
 
         KeyboardState previousKeyboardState;
         GamePadState previousGamePadState;
 
-        bool zoom = false;
         bool fog = false;
         bool collision;
         bool night = false;
@@ -214,9 +213,6 @@ namespace MazeGame
                 if (fog)
                 {
                     effect.FogEnabled = true;
-                    effect.FogColor = Color.Black.ToVector3();
-                    effect.FogStart = 0.2f;
-                    effect.FogEnd = 2f;
                 }
                 else
                 {
@@ -233,17 +229,34 @@ namespace MazeGame
                 collision = !collision;
             }
 
-            // toggle Zoom on/off
-            if (currentKeyboardState.IsKeyDown(Keys.F) ||
-                currentGamePadState.IsButtonDown(Buttons.RightStick))
+            // Zoom in/out for keyboard
+            if ( currentKeyboardState.IsKeyDown(Keys.Z) )
             {
-                zoom = !zoom;
-                
+				if ( (currentKeyboardState.IsKeyDown(Keys.LeftShift) || 
+					currentKeyboardState.IsKeyDown(Keys.RightShift)) ) 
+				{
+					camera.Zoom -= zoomScale * elapsed;
+				}
+				else
+				{
+					camera.Zoom += zoomScale * elapsed;
+				}
             }
+
+			// Zoom out for gampad
+			if ( currentGamePadState.IsButtonDown(Buttons.A) ) 
+			{
+				camera.Zoom -= zoomScale * elapsed;
+			}
+			// Zoom in for gampad
+			if ( currentGamePadState.IsButtonDown(Buttons.B) )
+			{
+				camera.Zoom += zoomScale * elapsed;
+			}
 
             // toggle Night/Day
             if (currentKeyboardState.IsKeyDown(Keys.E) ||
-                currentGamePadState.IsButtonDown(Buttons.B))
+                currentGamePadState.IsButtonDown(Buttons.LeftShoulder))
             {
                 night = !night;
             }
@@ -267,16 +280,7 @@ namespace MazeGame
 		{
 			GraphicsDevice.Clear( Color.CornflowerBlue );
 
-			maze.Draw(camera);
-			
-			effect.VertexColorEnabled = true;
-            effect.World = Matrix.Identity;
-			effect.View = camera.View;
-			effect.Projection = camera.Projection;
-			foreach (EffectPass pass in effect.CurrentTechnique.Passes)
-			{
-				pass.Apply();
-			}
+			maze.Draw(camera, effect);
 
 			base.Draw( gameTime );
 		}
