@@ -412,9 +412,9 @@ namespace MazeGame
 
             // Set the shader fog parameters.
             // enable and disabled set in MazeGame fog toggle
-            effect.Parameters["fog"].StructureMembers["FogStart"].SetValue(0.1f);
-            effect.Parameters["fog"].StructureMembers["FogEnd"].SetValue(2f);
-            effect.Parameters["fog"].StructureMembers["FogColor"].SetValue(Color.DarkSlateGray.ToVector3());
+            effect.Parameters["fog"].StructureMembers["FogStart"].SetValue(1f);
+            effect.Parameters["fog"].StructureMembers["FogEnd"].SetValue(4f);
+            effect.Parameters["fog"].StructureMembers["FogColor"].SetValue(Color.Black.ToVector3());
         }
 
         public void Draw(Camera camera, Effect effect)
