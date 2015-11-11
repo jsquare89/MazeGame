@@ -401,7 +401,7 @@ namespace MazeGame
             effect.Parameters["light"].StructureMembers["specular"].SetValue(Color.White.ToVector4());
             effect.Parameters["light"].StructureMembers["spotInnerCone"].SetValue(MathHelper.ToRadians(20.0f));
             effect.Parameters["light"].StructureMembers["spotOuterCone"].SetValue(MathHelper.ToRadians(30.0f));
-            effect.Parameters["light"].StructureMembers["radius"].SetValue(10.0f);
+            //effect.Parameters["light"].StructureMembers["radius"].SetValue(10.0f); - flash toggle moved to MazeGame 
 
             // Set the shader material parameters.
             // ambient set in MazeGame toggleAmbient

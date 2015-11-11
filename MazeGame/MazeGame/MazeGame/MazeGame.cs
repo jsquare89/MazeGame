@@ -30,6 +30,7 @@ namespace MazeGame
         // fog and day/night settings
         bool fog;
         bool ambient;
+        bool flash;
         Color skyColor;
 
 		public MazeGame()
@@ -82,6 +83,7 @@ namespace MazeGame
             effect = Content.Load<Effect>("shader");
             effect.Parameters["material"].StructureMembers["ambient"].SetValue(new Vector4(0.65f, 0.65f, 0.6f, 1.0f));
             effect.Parameters["fog"].StructureMembers["FogEnabled"].SetValue(false);
+            effect.Parameters["light"].StructureMembers["radius"].SetValue(0.1f);
             
 			// TODO: use this.Content to load your game content here
 			maze.LoadContent(Content);
@@ -128,6 +130,7 @@ namespace MazeGame
             // toggle features on keyboard/gamepad input
             FogToggle(currentKeyboardState, currentGamePadState);
             AmbientToggle(currentKeyboardState, currentGamePadState);
+            FlashToggle(currentKeyboardState, currentGamePadState);
 
             // save previous states
             previousKeyboardState = currentKeyboardState;
@@ -143,8 +146,8 @@ namespace MazeGame
         protected void FogToggle(KeyboardState currentKeyboardState, GamePadState currentGamePadState)
         {
             
-            if ((previousKeyboardState.IsKeyDown(Keys.F) &&
-                currentKeyboardState.IsKeyUp(Keys.F)) ||
+            if ((previousKeyboardState.IsKeyDown(Keys.Q) &&
+                currentKeyboardState.IsKeyUp(Keys.Q)) ||
                 (previousGamePadState.IsButtonDown(Buttons.X) &&
                 currentGamePadState.IsButtonUp(Buttons.X)))
             {
@@ -187,6 +190,29 @@ namespace MazeGame
                 
             }
         }
+
+        protected void FlashToggle(KeyboardState currentKeyboardState, GamePadState currentGamePadState)
+        {
+            if ((previousKeyboardState.IsKeyDown(Keys.F) &&
+                currentKeyboardState.IsKeyUp(Keys.F)) ||
+                (previousGamePadState.IsButtonDown(Buttons.LeftShoulder) &&
+                currentGamePadState.IsButtonUp(Buttons.LeftShoulder)))
+            {
+                flash = !flash;
+
+                // toggle Fog on/off
+                if (flash)
+                {
+                    effect.Parameters["light"].StructureMembers["radius"].SetValue(12.0f);
+                }
+                else
+                {
+                    effect.Parameters["light"].StructureMembers["radius"].SetValue(0.1f);
+                }
+            }
+            
+        }
+
 
 		/// <summary>
 		/// This is called when the game should draw itself.
