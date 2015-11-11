@@ -21,16 +21,16 @@ namespace MazeGame
 
 		Camera camera;
 		Maze maze;
-		BasicEffect effect;
-        Effect ambientEffect;
+        Effect effect;
 
         // Input handling
         KeyboardState previousKeyboardState;
         GamePadState previousGamePadState;
 
-        // Feature handling
+        // fog and day/night settings
         bool fog;
         bool ambient;
+        Color skyColor;
 
 		public MazeGame()
 		{
@@ -59,12 +59,12 @@ namespace MazeGame
 				100f);
 
             // Other variables to initialize
-			effect = new BasicEffect(GraphicsDevice);
             maze = new Maze(GraphicsDevice);
 
             // Set default feature states
             fog = false;
             ambient = true;
+            skyColor = Color.DeepSkyBlue;
 
 			base.Initialize();
 		}
@@ -78,8 +78,14 @@ namespace MazeGame
 			// Create a new SpriteBatch, which can be used to draw textures.
 			spriteBatch = new SpriteBatch( GraphicsDevice );
 
-            ambientEffect = Content.Load<Effect>("Ambient");
+            // Load shader and set defaults
+            effect = Content.Load<Effect>("shader");
+            effect.Parameters["material"].StructureMembers["ambient"].SetValue(new Vector4(0.65f, 0.65f, 0.6f, 1.0f));
+            effect.Parameters["fog"].StructureMembers["FogEnabled"].SetValue(false);
             
+			// TODO: use this.Content to load your game content here
+			maze.LoadContent(Content);
+
 		}
 
 		/// <summary>
@@ -119,7 +125,6 @@ namespace MazeGame
             if (currentGamePadState.Buttons.Back == ButtonState.Pressed ||
                 currentKeyboardState.IsKeyDown(Keys.Escape))
                 this.Exit();
-
             // toggle features on keyboard/gamepad input
             FogToggle(currentKeyboardState, currentGamePadState);
             AmbientToggle(currentKeyboardState, currentGamePadState);
@@ -144,28 +149,42 @@ namespace MazeGame
                 currentGamePadState.IsButtonUp(Buttons.X)))
             {
                 fog = !fog;
+
                 // toggle Fog on/off
                 if (fog)
                 {
-                    effect.FogEnabled = true;
-                    effect.FogColor = Color.Black.ToVector3();
-                    effect.FogStart = 0.2f;
-                    effect.FogEnd = 2f;
+                    effect.Parameters["fog"].StructureMembers["FogEnabled"].SetValue(true);
                 }
                 else
                 {
-                    effect.FogEnabled = false;
+                    effect.Parameters["fog"].StructureMembers["FogEnabled"].SetValue(false);
                 }
             }
+
         }
 
         protected void AmbientToggle(KeyboardState currentKeyboardState, GamePadState currentGamePadState)
         {
             // toggle Ambient - Night/Day effect
-            if (currentKeyboardState.IsKeyDown(Keys.E) ||
-                currentGamePadState.IsButtonDown(Buttons.RightShoulder))
+            if (previousKeyboardState.IsKeyDown(Keys.E) &&
+                currentKeyboardState.IsKeyUp(Keys.E) ||
+                previousGamePadState.IsButtonDown(Buttons.RightShoulder) &&
+                currentGamePadState.IsButtonUp(Buttons.RightShoulder))
             {
                 ambient = !ambient;
+
+                // Ambient true sets to day time effect, false sets to night time effect
+                if(ambient)
+                {
+                    skyColor = Color.DeepSkyBlue;
+                    effect.Parameters["material"].StructureMembers["ambient"].SetValue(new Vector4(0.65f, 0.65f, 0.6f, 1.0f));
+                }
+                else
+                {
+                    skyColor = Color.DarkSlateGray;
+                    effect.Parameters["material"].StructureMembers["ambient"].SetValue(new Vector4(0.1f, 0.1f, 0.15f, 1.0f));
+                }
+                
             }
         }
 
@@ -175,9 +194,9 @@ namespace MazeGame
 		/// <param name="gameTime">Provides a snapshot of timing values.</param>
 		protected override void Draw( GameTime gameTime )
 		{
-			GraphicsDevice.Clear( Color.CornflowerBlue );
+			GraphicsDevice.Clear(skyColor);
 
-			maze.Draw(camera, effect);         
+			maze.Draw(camera, effect);
 
 			base.Draw( gameTime );
 		}

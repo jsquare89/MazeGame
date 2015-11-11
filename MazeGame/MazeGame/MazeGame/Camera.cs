@@ -9,6 +9,7 @@ namespace MazeGame
 {
     class Camera
 	{
+		private float zoom = 1;
 		private Vector3 position = Vector3.Zero;
         private Vector3 initialPosition;
         private float initialRotation;
@@ -20,10 +21,7 @@ namespace MazeGame
 		private Matrix cachedViewMatrix;
 
         // used for zoom function
-        float zoomFOV;
-        float scale = 0.01f;
-        const float MIN_ZOOM = MathHelper.PiOver4;
-        const float MAX_ZOOM = MathHelper.Pi/6;
+        float zoomScale = 1.5f;
 
         // Camera Setup
         float aspectRatio;
@@ -42,6 +40,23 @@ namespace MazeGame
         float moveScale = 1.5f;
         float rotateScale = MathHelper.PiOver2;
         bool collision;
+
+        public float Zoom
+        {
+            get
+            {
+                return zoom;
+            }
+            set
+            {
+                zoom = MathHelper.Min(4, MathHelper.Max(1, value));
+                Projection = Matrix.CreatePerspectiveFieldOfView(
+                        MathHelper.PiOver4 / Zoom,
+                        aspectRatio,
+                        nearClip,
+                        farClip);
+            }
+        }
 
 		public Matrix Projection
 		{
@@ -82,7 +97,7 @@ namespace MazeGame
             }
             set
             {
-                rotationY = value;
+                rotationY = MathHelper.Max(-MathHelper.PiOver4, MathHelper.Min(value, MathHelper.PiOver4));
                 UpdateLookAt();
             }
         }
@@ -91,14 +106,19 @@ namespace MazeGame
 		{
 			get
 			{
-				if (needViewResync)
+				if ( needViewResync )
+				{
 					cachedViewMatrix = Matrix.CreateLookAt(
 						Position,
 						lookAt,
 						Vector3.Up);
+					cachedViewMatrix *= Matrix.CreateRotationX(-rotationY);
+				}
+					
 				return cachedViewMatrix;
 			}
 		}
+
 
 
         /// <summary>
@@ -113,19 +133,19 @@ namespace MazeGame
         {
 			// Setup camera projection
             Projection = Matrix.CreatePerspectiveFieldOfView(
-				MIN_ZOOM,
-				aspectRatio,
-				nearClip,
-				farClip);
-			MoveTo(position, rotation);
-
+                MathHelper.PiOver4 / Zoom,
+                aspectRatio,
+                nearClip,
+                farClip);
 
             //Store local variables for later use. recalculating zoom and resetting initial position
             this.aspectRatio = aspectRatio;
             this.nearClip = nearClip;
             this.farClip = farClip;
-            zoomFOV = MIN_ZOOM;
             rotationX = rotation;
+
+			MoveTo(position, rotation);
+
             initialPosition = position;
             initialRotation = rotation;
 
@@ -225,14 +245,12 @@ namespace MazeGame
             // Move Forward
             if (currentKeyboardState.IsKeyDown(Keys.W))
             {
-                //camera.MoveForward(moveScale * elapsed);
                 moveAmount.Z = moveScale * elapsedTime;
             }
 
             // Move Backward
             if (currentKeyboardState.IsKeyDown(Keys.S))
             {
-                //camera.MoveForward(-moveScale * elapsed);
                 moveAmount.Z = -moveScale * elapsedTime;
             }
 
@@ -240,16 +258,12 @@ namespace MazeGame
             if (currentKeyboardState.IsKeyDown(Keys.A))
             {
                 moveAmount.X = moveScale * elapsedTime;
-                //camera.Rotation = MathHelper.WrapAngle(
-                //camera.Rotation + (rotateScale * elapsed));
             }
 
             // Strafe Right
             if (currentKeyboardState.IsKeyDown(Keys.D))
             {
                 moveAmount.X = -moveScale * elapsedTime;
-                //camera.Rotation = MathHelper.WrapAngle(
-                //	camera.Rotation - (rotateScale * elapsed));
             }
 
             // Look Left
@@ -265,37 +279,35 @@ namespace MazeGame
                 RotationX = MathHelper.WrapAngle(RotationX - (rotateScale * elapsedTime));
             }
 
-            //float dX = elapsedTime * ReadKeyboardAxis(
-            //    currentKeyboardState, Keys.A, Keys.D) * rotateScale;
-            //float dY = elapsedTime * ReadKeyboardAxis(
-            //    currentKeyboardState, Keys.S, Keys.W) * rotateScale;
-
-            //if (dY != 0) OrbitUp(dY);
-            //if (dX != 0) OrbitRight(dX);
-
             // Look Up
             if (currentKeyboardState.IsKeyDown(Keys.Up))
             {
-                RotationY = MathHelper.WrapAngle(RotationY - (rotateScale * elapsedTime));
+                RotationY = MathHelper.WrapAngle(RotationY + (rotateScale * elapsedTime));
             }
 
             // Look Down
             if (currentKeyboardState.IsKeyDown(Keys.Down))
             {
-                RotationY = MathHelper.WrapAngle(RotationY + (rotateScale * elapsedTime));
+                RotationY = MathHelper.WrapAngle(RotationY - (rotateScale * elapsedTime));
             }
 
             // toggle Collision on/off - using C instead of W
             if ((previousKeyboardState.IsKeyDown(Keys.C) && currentKeyboardState.IsKeyUp(Keys.C)))
                 collision = !collision;
 
-            // toggle Zoom in
-            if (currentKeyboardState.IsKeyDown(Keys.X))
-                zoomIn();
-
-            // toggle out
+            // Zoom in/out for keyboard
             if (currentKeyboardState.IsKeyDown(Keys.Z))
-                zoomOut();
+            {
+                if ((currentKeyboardState.IsKeyDown(Keys.LeftShift) ||
+                    currentKeyboardState.IsKeyDown(Keys.RightShift)))
+                {
+                    Zoom -= zoomScale * elapsedTime;
+                }
+                else
+                {
+                    Zoom += zoomScale * elapsedTime;
+                }
+            }
 
             // Reset position to start position
             if (currentKeyboardState.IsKeyDown(Keys.Home))
@@ -306,76 +318,68 @@ namespace MazeGame
 
         public void HandleGamePadInput(GamePadState currentGamePadState, GameTime gameTime)
         {
-            float elapsed = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            float elapsedTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
             
-
             if (currentGamePadState.IsConnected)
             {
                 // Move Forward
                 if (currentGamePadState.IsButtonDown(Buttons.LeftThumbstickUp))
                 {
-                    //camera.MoveForward(moveScale * elapsed);
-                    moveAmount.Z = moveScale * elapsed;
+                    moveAmount.Z = moveScale * elapsedTime;
                 }
 
                 // Move Backward
                 if (currentGamePadState.IsButtonDown(Buttons.LeftThumbstickDown))
                 {
-                    //camera.MoveForward(-moveScale * elapsed);
-                    moveAmount.Z = -moveScale * elapsed;
+                    moveAmount.Z = -moveScale * elapsedTime;
                 }
 
                 // Strafe Left
                 if (currentGamePadState.IsButtonDown(Buttons.LeftThumbstickLeft))
                 {
-                    moveAmount.X = moveScale * elapsed;
-                    //camera.Rotation = MathHelper.WrapAngle(
-                    //camera.Rotation + (rotateScale * elapsed));
+                    moveAmount.X = moveScale * elapsedTime;
                 }
 
                 // Strafe Right
                 if (currentGamePadState.IsButtonDown(Buttons.LeftThumbstickRight))
                 {
-                    moveAmount.X = -moveScale * elapsed;
-                    //camera.Rotation = MathHelper.WrapAngle(
-                    //	camera.Rotation - (rotateScale * elapsed));
+                    moveAmount.X = -moveScale * elapsedTime;
                 }
 
                 // Look Left
                 if (currentGamePadState.IsButtonDown(Buttons.RightThumbstickLeft))
                 {
-                    RotationX = MathHelper.WrapAngle(RotationX + (rotateScale * elapsed));
+                    RotationX = MathHelper.WrapAngle(RotationX + (rotateScale * elapsedTime));
                 }
 
                 // Look Right
                 if (currentGamePadState.IsButtonDown(Buttons.RightThumbstickRight))
                 {
-                    RotationX = MathHelper.WrapAngle(RotationX - (rotateScale * elapsed));
+                    RotationX = MathHelper.WrapAngle(RotationX - (rotateScale * elapsedTime));
                 }
 
                 // Look Up
                 if (currentGamePadState.IsButtonDown(Buttons.RightThumbstickUp))
                 {
-                    RotationY = MathHelper.WrapAngle(RotationY - (rotateScale * elapsed));
+                    RotationY = MathHelper.WrapAngle(RotationY + (rotateScale * elapsedTime));
                 }
 
                 // Look Down
                 if (currentGamePadState.IsButtonDown(Buttons.RightThumbstickDown))
                 {
-                    RotationY = MathHelper.WrapAngle(RotationY + (rotateScale * elapsed));
+                    RotationY = MathHelper.WrapAngle(RotationY - (rotateScale * elapsedTime));
                 }
 
                 // toggle Collision on/off - using C instead of W
                 if (previousGamePadState.IsButtonDown(Buttons.Y) && currentGamePadState.IsButtonUp(Buttons.Y))
                     collision = !collision;
 
-                // toggle Zoom in
-                if (currentGamePadState.IsButtonDown(Buttons.B))
-                    zoomIn();
-
-                // toggle out
+                // Zoom out for gamepad
                 if (currentGamePadState.IsButtonDown(Buttons.A))
-                    zoomOut();
+                    Zoom -= zoomScale * elapsedTime;
+                // Zoom in for gamepad
+                if (currentGamePadState.IsButtonDown(Buttons.B))
+                    Zoom += zoomScale * elapsedTime;
 
                 // Reset position to start position
                 if (currentGamePadState.IsButtonDown(Buttons.Start))
@@ -410,40 +414,6 @@ namespace MazeGame
                     MoveForward(moveAmount);
             }
         }
-
-        /// <summary>
-        /// Changes the camera's field of view to zoom in
-        /// </summary>
-        public void zoomIn()
-        {
-            if (zoomFOV > MAX_ZOOM)
-            {
-                zoomFOV = zoomFOV - scale;
-                Projection = Matrix.CreatePerspectiveFieldOfView(
-                    zoomFOV,
-                    aspectRatio,
-                    nearClip,
-                    farClip);
-                MoveTo(position, rotationX);
-            }
-        }
-
-        /// <summary>
-        /// Changes the camera's field of view to zoom out
-        /// </summary>
-        public void zoomOut()
-        {
-            if (zoomFOV < MIN_ZOOM)
-            {
-                zoomFOV = zoomFOV + scale;
-                Projection = Matrix.CreatePerspectiveFieldOfView(
-                    zoomFOV,
-                    aspectRatio,
-                    nearClip,
-                    farClip);
-                MoveTo(position, rotationX);
-            }
-        }   
         
     }
 }

@@ -4,4 +4,9 @@ C:\Users\jarre_000\Documents\GitHub\MazeGame\MazeGame\MazeGame\MazeGame\obj\x86\
 C:\Users\jarre_000\Documents\GitHub\MazeGame\MazeGame\MazeGame\MazeGame\obj\x86\Debug\Microsoft.Xna.Framework.RuntimeProfile.txt
 C:\Users\jarre_000\Documents\GitHub\MazeGame\MazeGame\MazeGame\MazeGame\obj\x86\Debug\MazeGame.exe
 C:\Users\jarre_000\Documents\GitHub\MazeGame\MazeGame\MazeGame\MazeGame\obj\x86\Debug\MazeGame.pdb
-C:\Users\jarre_000\Documents\GitHub\MazeGame\MazeGame\MazeGame\MazeGame\bin\x86\Debug\Content\Ambient.xnb
+C:\Users\jarre_000\Documents\GitHub\MazeGame\MazeGame\MazeGame\MazeGame\bin\x86\Debug\Content\wall.xnb
+C:\Users\jarre_000\Documents\GitHub\MazeGame\MazeGame\MazeGame\MazeGame\bin\x86\Debug\Content\floor.xnb
+C:\Users\jarre_000\Documents\GitHub\MazeGame\MazeGame\MazeGame\MazeGame\bin\x86\Debug\Content\wall2.xnb
+C:\Users\jarre_000\Documents\GitHub\MazeGame\MazeGame\MazeGame\MazeGame\bin\x86\Debug\Content\wall3.xnb
+C:\Users\jarre_000\Documents\GitHub\MazeGame\MazeGame\MazeGame\MazeGame\bin\x86\Debug\Content\wall4.xnb
+C:\Users\jarre_000\Documents\GitHub\MazeGame\MazeGame\MazeGame\MazeGame\bin\x86\Debug\Content\shader.xnb
