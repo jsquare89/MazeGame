@@ -41,6 +41,9 @@ namespace MazeGame
         float rotateScale = MathHelper.PiOver2;
         bool collision;
 
+        /// <summary>
+        /// Changes the Field of view to zoom in and out
+        /// </summary>
         public float Zoom
         {
             get
@@ -49,7 +52,9 @@ namespace MazeGame
             }
             set
             {
+                // Zoom factor between 1 and 4
                 zoom = MathHelper.Min(4, MathHelper.Max(1, value));
+                // create new zoom projection
                 Projection = Matrix.CreatePerspectiveFieldOfView(
                         MathHelper.PiOver4 / Zoom,
                         aspectRatio,
