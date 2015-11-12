@@ -10,3 +10,15 @@ C:\Users\jarre_000\Documents\GitHub\MazeGame\MazeGame\MazeGame\MazeGame\obj\Xbox
 C:\Users\jarre_000\Documents\GitHub\MazeGame\MazeGame\MazeGame\MazeGame\obj\Xbox 360\Debug\Microsoft.Xna.Framework.RuntimeProfile.txt
 C:\Users\jarre_000\Documents\GitHub\MazeGame\MazeGame\MazeGame\MazeGame\obj\Xbox 360\Debug\MazeGame.exe
 C:\Users\jarre_000\Documents\GitHub\MazeGame\MazeGame\MazeGame\MazeGame\obj\Xbox 360\Debug\MazeGame.pdb
+D:\Development\xna\MazeGame\MazeGame\MazeGame\MazeGame\bin\Xbox 360\Debug\Content\shader.xnb
+D:\Development\xna\MazeGame\MazeGame\MazeGame\MazeGame\bin\Xbox 360\Debug\Content\wall.xnb
+D:\Development\xna\MazeGame\MazeGame\MazeGame\MazeGame\bin\Xbox 360\Debug\Content\floor.xnb
+D:\Development\xna\MazeGame\MazeGame\MazeGame\MazeGame\bin\Xbox 360\Debug\Content\wall2.xnb
+D:\Development\xna\MazeGame\MazeGame\MazeGame\MazeGame\bin\Xbox 360\Debug\Content\wall3.xnb
+D:\Development\xna\MazeGame\MazeGame\MazeGame\MazeGame\bin\Xbox 360\Debug\Content\wall4.xnb
+D:\Development\xna\MazeGame\MazeGame\MazeGame\MazeGame\bin\Xbox 360\Debug\MazeGame.exe
+D:\Development\xna\MazeGame\MazeGame\MazeGame\MazeGame\bin\Xbox 360\Debug\MazeGame.pdb
+D:\Development\xna\MazeGame\MazeGame\MazeGame\MazeGame\obj\Xbox 360\Debug\Xbox 360 Copy of MazeGame.csprojResolveAssemblyReference.cache
+D:\Development\xna\MazeGame\MazeGame\MazeGame\MazeGame\obj\Xbox 360\Debug\Microsoft.Xna.Framework.RuntimeProfile.txt
+D:\Development\xna\MazeGame\MazeGame\MazeGame\MazeGame\obj\Xbox 360\Debug\MazeGame.exe
+D:\Development\xna\MazeGame\MazeGame\MazeGame\MazeGame\obj\Xbox 360\Debug\MazeGame.pdb

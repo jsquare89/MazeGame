@@ -8,6 +8,10 @@ using System.Text;
 
 namespace MazeGame
 {
+	/// <summary>
+	/// The Maze class contains the algorithm to generate random walls inside the maze using breath-first algorithm.
+	/// It also draws the maze that the player will see.
+	/// </summary>
     class Maze
     {
         public const int MAZE_WIDTH = 20;
@@ -28,7 +32,10 @@ namespace MazeGame
         Texture2D[] wallTextures = new Texture2D[4];
         BasicEffect[] wallEffects = new BasicEffect[4];
 
-
+		/// <summary>
+		/// The Maze construcotr generates floor and walls vertices
+		/// </summary>
+		/// <param name="device"></param>
         public Maze(GraphicsDevice device)
         {
             this.device = device;
@@ -66,9 +73,8 @@ namespace MazeGame
         }
 
 
-        /// <summary>
-        /// 
-        /// </summary>
+        // This helper function generates all the vertices for floor tiles.
+		// Each loor tiles has a width and height of 1.
         private void BuildFloorVertices()
         {
             List<VertexPositionNormalTexture> vertexList =
@@ -82,6 +88,7 @@ namespace MazeGame
                 for (int z = 0; z < MAZE_HEIGHT; z++)
                 {
                     counter++;
+					// creates vertices for the floor tiles
                     foreach (VertexPositionNormalTexture vertex in
                         FloorTile(x, z, Color.White))
                     {
@@ -93,13 +100,7 @@ namespace MazeGame
             floorVertices = vertexList.ToArray();
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="xOffset"></param>
-        /// <param name="zOffset"></param>
-        /// <param name="tileColor"></param>
-        /// <returns></returns>
+        // A helper function to create the 3 triangles that make up one floor tile
         private List<VertexPositionNormalTexture> FloorTile(
             int xOffset,
             int zOffset,
@@ -124,7 +125,7 @@ namespace MazeGame
         }
 
         /// <summary>
-        /// 
+        /// The main function that use the breathe-first algorithm to create random walls in the maze
         /// </summary>
         public void GenerateMaze()
         {
@@ -144,14 +145,7 @@ namespace MazeGame
             EvaluateCell(new Vector2(0, 0));
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="z"></param>
-        /// <param name="point1"></param>
-        /// <param name="point2"></param>
-        /// <returns></returns>
+        // Helper function to create bounding boxes for collision detection for player and the wall
         private BoundingBox BuildBoundingBox(
                 int x,
                 int z,
@@ -175,11 +169,11 @@ namespace MazeGame
         }
 
         /// <summary>
-        /// 
+        /// Get all bounding boxs of the walls that exist
         /// </summary>
-        /// <param name="x"></param>
-        /// <param name="z"></param>
-        /// <returns></returns>
+        /// <param name="x">The row of our maze </param>
+        /// <param name="z">The column of our maze</param>
+        /// <returns>List of BoundingBoxs that can collides with player</returns>
         public List<BoundingBox> GetBoundsForCell(int x, int z)
         {
             List<BoundingBox> boxes = new List<BoundingBox>();
@@ -194,10 +188,7 @@ namespace MazeGame
             return boxes;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="cell"></param>
+        // Helper function that does the heavy lifting of generating random maze through recursive calls
         private void EvaluateCell(Vector2 cell)
         {
             List<int> neighborCells = new List<int>();
@@ -250,9 +241,7 @@ namespace MazeGame
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
+        /// Helper functions that gathers vertices of walls for the four different directions
         private void BuildWallVertices()
         {
             List<VertexPositionNormalTexture>[] wallVertexLists = new List<VertexPositionNormalTexture>[4] {
@@ -274,14 +263,11 @@ namespace MazeGame
             wallVertices[3] = wallVertexLists[3].ToArray();
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="z"></param>
-        /// <param name="triangleLists"></param>
+        // Helper function that determine if the wall exist, add the triangle vertices so the wall will be
+		// drawn later on
         private void BuildMazeWall(int x, int z, List<VertexPositionNormalTexture>[] triangleLists)
         {
+			// North
             if (MazeCells[x, z].Walls[0])
             {
                 triangleLists[0].Add(CalcPoint(0, x, z, Vector3.UnitZ, new Vector2(0, 1)));
@@ -292,6 +278,7 @@ namespace MazeGame
                 triangleLists[0].Add(CalcPoint(2, x, z, Vector3.UnitZ, new Vector2(0, 0)));
             }
 
+			// East
             if (MazeCells[x, z].Walls[1])
             {
                 triangleLists[1].Add(CalcPoint(4, x, z, -Vector3.UnitX, new Vector2(0, 1)));
@@ -302,6 +289,7 @@ namespace MazeGame
                 triangleLists[1].Add(CalcPoint(6, x, z, -Vector3.UnitX, new Vector2(0, 0)));
             }
 
+			// South
             if (MazeCells[x, z].Walls[2])
             {
                 triangleLists[2].Add(CalcPoint(5, x, z, -Vector3.UnitZ, new Vector2(0, 1)));
@@ -312,6 +300,7 @@ namespace MazeGame
                 triangleLists[2].Add(CalcPoint(7, x, z, -Vector3.UnitZ, new Vector2(0, 0)));
             }
 
+			// West
             if (MazeCells[x, z].Walls[3])
             {
                 triangleLists[3].Add(CalcPoint(1, x, z, Vector3.UnitX, new Vector2(0, 1)));
@@ -323,20 +312,13 @@ namespace MazeGame
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="wallPoint"></param>
-        /// <param name="xOffset"></param>
-        /// <param name="zOffset"></param>
-        /// <param name="normal"></param>
-        /// <param name="textCoords"></param>
-        /// <returns></returns>
+        // helper function that calculate the coordinates of wall
         private VertexPositionNormalTexture CalcPoint(int wallPoint, int xOffset, int zOffset, Vector3 normal, Vector2 textCoords)
         {
             return new VertexPositionNormalTexture(wallPoints[wallPoint] + new Vector3(xOffset, 0, zOffset), normal, textCoords);
         }
 
+		// helper function to draw the floor
         private void DrawFloors(Camera camera, Effect effect)
         {
             effect.Parameters["colorMapTexture"].SetValue(floorTexture);
@@ -347,7 +329,7 @@ namespace MazeGame
             }
         }
 
-        
+        // helper function to draw walls
         private void DrawWalls(Camera camera, Effect effect)
         {
             // iterate each wall and draw 
@@ -419,7 +401,7 @@ namespace MazeGame
 
         public void Draw(Camera camera, Effect effect)
         {
-            //
+
             device.SamplerStates[0] = SamplerState.LinearClamp;
 
             ConfigureShader(camera, effect);
