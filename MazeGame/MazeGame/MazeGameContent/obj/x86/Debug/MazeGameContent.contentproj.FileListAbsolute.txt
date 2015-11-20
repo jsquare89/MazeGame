@@ -1,1 +1,2 @@
 C:\Users\jarre_000\Documents\GitHub\MazeGame\MazeGame\MazeGame\MazeGameContent\obj\x86\Debug\MazeGameContent.contentprojResolveAssemblyReference.cache
+C:\Users\Jarred\Documents\MazeGame\MazeGame\MazeGame\MazeGameContent\obj\x86\Debug\MazeGameContent.contentprojResolveAssemblyReference.cache

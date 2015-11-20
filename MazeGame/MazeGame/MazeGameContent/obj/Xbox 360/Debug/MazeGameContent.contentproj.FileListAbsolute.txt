@@ -1,1 +1,2 @@
 D:\Development\xna\MazeGame\MazeGame\MazeGame\MazeGameContent\obj\Xbox 360\Debug\MazeGameContent.contentprojResolveAssemblyReference.cache
+C:\Users\Jarred\Documents\MazeGame\MazeGame\MazeGame\MazeGameContent\obj\Xbox 360\Debug\MazeGameContent.contentprojResolveAssemblyReference.cache
