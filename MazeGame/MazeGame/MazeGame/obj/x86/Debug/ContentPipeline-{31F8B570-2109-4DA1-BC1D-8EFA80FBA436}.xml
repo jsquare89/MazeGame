@@ -7,7 +7,7 @@
       <Importer>EffectImporter</Importer>
       <Processor>EffectProcessor</Processor>
       <Options>None</Options>
-      <Output>C:\Users\Jarred\Documents\MazeGame\MazeGame\MazeGame\MazeGame\bin\x86\Debug\Content\shader.xnb</Output>
+      <Output>C:\Users\Jarred\Documents\GitHub\MazeGame\MazeGame\MazeGame\MazeGame\bin\x86\Debug\Content\shader.xnb</Output>
       <Time>2015-11-18T22:28:01.3327286-08:00</Time>
     </Item>
     <Item>
@@ -16,7 +16,7 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
-      <Output>C:\Users\Jarred\Documents\MazeGame\MazeGame\MazeGame\MazeGame\bin\x86\Debug\Content\wall.xnb</Output>
+      <Output>C:\Users\Jarred\Documents\GitHub\MazeGame\MazeGame\MazeGame\MazeGame\bin\x86\Debug\Content\wall.xnb</Output>
       <Time>2015-11-18T22:28:01.3402335-08:00</Time>
     </Item>
     <Item>
@@ -25,7 +25,7 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
-      <Output>C:\Users\Jarred\Documents\MazeGame\MazeGame\MazeGame\MazeGame\bin\x86\Debug\Content\floor.xnb</Output>
+      <Output>C:\Users\Jarred\Documents\GitHub\MazeGame\MazeGame\MazeGame\MazeGame\bin\x86\Debug\Content\floor.xnb</Output>
       <Time>2015-11-18T22:28:01.3217191-08:00</Time>
     </Item>
     <Item>
@@ -34,7 +34,7 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
-      <Output>C:\Users\Jarred\Documents\MazeGame\MazeGame\MazeGame\MazeGame\bin\x86\Debug\Content\wall2.xnb</Output>
+      <Output>C:\Users\Jarred\Documents\GitHub\MazeGame\MazeGame\MazeGame\MazeGame\bin\x86\Debug\Content\wall2.xnb</Output>
       <Time>2015-11-18T22:28:01.3452374-08:00</Time>
     </Item>
     <Item>
@@ -43,7 +43,7 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
-      <Output>C:\Users\Jarred\Documents\MazeGame\MazeGame\MazeGame\MazeGame\bin\x86\Debug\Content\wall3.xnb</Output>
+      <Output>C:\Users\Jarred\Documents\GitHub\MazeGame\MazeGame\MazeGame\MazeGame\bin\x86\Debug\Content\wall3.xnb</Output>
       <Time>2015-11-18T22:28:01.3507413-08:00</Time>
     </Item>
     <Item>
@@ -52,8 +52,17 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
-      <Output>C:\Users\Jarred\Documents\MazeGame\MazeGame\MazeGame\MazeGame\bin\x86\Debug\Content\wall4.xnb</Output>
+      <Output>C:\Users\Jarred\Documents\GitHub\MazeGame\MazeGame\MazeGame\MazeGame\bin\x86\Debug\Content\wall4.xnb</Output>
       <Time>2015-11-18T22:28:01.3572459-08:00</Time>
+    </Item>
+    <Item>
+      <Source>Sounds\medievil_music2.wav</Source>
+      <Name>Sounds\medievil_music2</Name>
+      <Importer>WavImporter</Importer>
+      <Processor>SoundEffectProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\Jarred\Documents\GitHub\MazeGame\MazeGame\MazeGame\MazeGame\bin\x86\Debug\Content\Sounds\medievil_music2.xnb</Output>
+      <Time>2015-11-19T18:57:52.3978646-08:00</Time>
     </Item>
     <Item>
       <Source>Sounds\leftfootstep_sound.wav</Source>
@@ -61,7 +70,7 @@
       <Importer>WavImporter</Importer>
       <Processor>SoundEffectProcessor</Processor>
       <Options>None</Options>
-      <Output>C:\Users\Jarred\Documents\MazeGame\MazeGame\MazeGame\MazeGame\bin\x86\Debug\Content\Sounds\leftfootstep_sound.xnb</Output>
+      <Output>C:\Users\Jarred\Documents\GitHub\MazeGame\MazeGame\MazeGame\MazeGame\bin\x86\Debug\Content\Sounds\leftfootstep_sound.xnb</Output>
       <Time>2015-11-19T17:44:29.6661489-08:00</Time>
     </Item>
     <Item>
@@ -70,7 +79,7 @@
       <Importer>WavImporter</Importer>
       <Processor>SoundEffectProcessor</Processor>
       <Options>None</Options>
-      <Output>C:\Users\Jarred\Documents\MazeGame\MazeGame\MazeGame\MazeGame\bin\x86\Debug\Content\Sounds\medievil_music.xnb</Output>
+      <Output>C:\Users\Jarred\Documents\GitHub\MazeGame\MazeGame\MazeGame\MazeGame\bin\x86\Debug\Content\Sounds\medievil_music.xnb</Output>
       <Time>2015-11-19T18:00:00.796789-08:00</Time>
     </Item>
     <Item>
@@ -79,7 +88,7 @@
       <Importer>WavImporter</Importer>
       <Processor>SoundEffectProcessor</Processor>
       <Options>None</Options>
-      <Output>C:\Users\Jarred\Documents\MazeGame\MazeGame\MazeGame\MazeGame\bin\x86\Debug\Content\Sounds\rightfootstep_sound.xnb</Output>
+      <Output>C:\Users\Jarred\Documents\GitHub\MazeGame\MazeGame\MazeGame\MazeGame\bin\x86\Debug\Content\Sounds\rightfootstep_sound.xnb</Output>
       <Time>2015-11-19T17:49:23.5749456-08:00</Time>
     </Item>
     <Item>
@@ -88,17 +97,8 @@
       <Importer>WavImporter</Importer>
       <Processor>SoundEffectProcessor</Processor>
       <Options>None</Options>
-      <Output>C:\Users\Jarred\Documents\MazeGame\MazeGame\MazeGame\MazeGame\bin\x86\Debug\Content\Sounds\wallcollision_sound.xnb</Output>
+      <Output>C:\Users\Jarred\Documents\GitHub\MazeGame\MazeGame\MazeGame\MazeGame\bin\x86\Debug\Content\Sounds\wallcollision_sound.xnb</Output>
       <Time>2015-11-19T17:51:17.810396-08:00</Time>
-    </Item>
-    <Item>
-      <Source>Sounds\medievil_music2.wav</Source>
-      <Name>Sounds\medievil_music2</Name>
-      <Importer>WavImporter</Importer>
-      <Processor>SoundEffectProcessor</Processor>
-      <Options>None</Options>
-      <Output>C:\Users\Jarred\Documents\MazeGame\MazeGame\MazeGame\MazeGame\bin\x86\Debug\Content\Sounds\medievil_music2.xnb</Output>
-      <Time>2015-11-19T18:57:52.3978646-08:00</Time>
     </Item>
     <BuildSuccessful>true</BuildSuccessful>
     <Settings>
@@ -107,10 +107,10 @@
       <TargetProfile>Reach</TargetProfile>
       <BuildConfiguration>Debug</BuildConfiguration>
       <CompressContent>false</CompressContent>
-      <RootDirectory>C:\Users\Jarred\Documents\MazeGame\MazeGame\MazeGame\MazeGameContent\</RootDirectory>
-      <LoggerRootDirectory>C:\Users\Jarred\Documents\MazeGame\MazeGame\MazeGame\MazeGame\</LoggerRootDirectory>
-      <IntermediateDirectory>C:\Users\Jarred\Documents\MazeGame\MazeGame\MazeGame\MazeGame\obj\x86\Debug\</IntermediateDirectory>
-      <OutputDirectory>C:\Users\Jarred\Documents\MazeGame\MazeGame\MazeGame\MazeGame\bin\x86\Debug\Content\</OutputDirectory>
+      <RootDirectory>C:\Users\Jarred\Documents\GitHub\MazeGame\MazeGame\MazeGame\MazeGameContent\</RootDirectory>
+      <LoggerRootDirectory>C:\Users\Jarred\Documents\GitHub\MazeGame\MazeGame\MazeGame\MazeGame\</LoggerRootDirectory>
+      <IntermediateDirectory>C:\Users\Jarred\Documents\GitHub\MazeGame\MazeGame\MazeGame\MazeGame\obj\x86\Debug\</IntermediateDirectory>
+      <OutputDirectory>C:\Users\Jarred\Documents\GitHub\MazeGame\MazeGame\MazeGame\MazeGame\bin\x86\Debug\Content\</OutputDirectory>
     </Settings>
     <Assemblies>
       <Assembly>
