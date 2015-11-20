@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Audio;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -394,8 +395,8 @@ namespace MazeGame
 
             // Set the shader fog parameters.
             // enable and disabled set in MazeGame fog toggle
-            effect.Parameters["fog"].StructureMembers["FogStart"].SetValue(1f);
-            effect.Parameters["fog"].StructureMembers["FogEnd"].SetValue(4f);
+            effect.Parameters["fog"].StructureMembers["FogStart"].SetValue(0.5f);
+            effect.Parameters["fog"].StructureMembers["FogEnd"].SetValue(2.5f);
             effect.Parameters["fog"].StructureMembers["FogColor"].SetValue(Color.Black.ToVector3());
         }
 

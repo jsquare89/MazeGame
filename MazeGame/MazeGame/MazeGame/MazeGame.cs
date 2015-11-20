@@ -33,7 +33,17 @@ namespace MazeGame
         bool flash;
         Color skyColor;
 
-		public MazeGame()
+        // Sounds & Music
+        bool music; // used to turn on and off
+        SoundEffect wallCollisionAudio;
+        SoundEffect leftFootStepAudio;
+        SoundEffect rightFootStepAudio;
+        SoundEffect musicDay;
+        SoundEffect musicNight;
+        SoundEffectInstance currentMusic;
+
+
+        public MazeGame()
 		{
 			graphics = new GraphicsDeviceManager( this );
 			Content.RootDirectory = "Content";
@@ -51,13 +61,16 @@ namespace MazeGame
             graphics.IsFullScreen = false;
             graphics.ApplyChanges();
 
+            // initialise sound for camera
+            wallCollisionAudio = Content.Load<SoundEffect>("Sounds/wallcollision_sound");
+
             // Setup camera
-			camera = new Camera(
+            camera = new Camera(
 				new Vector3(0.5f, 0.5f, 0.5f),
 				0,
 				GraphicsDevice.Viewport.AspectRatio,
 				0.05f,
-				100f);
+				100f, wallCollisionAudio);
 
             // Other variables to initialize
             maze = new Maze(GraphicsDevice);
@@ -88,7 +101,21 @@ namespace MazeGame
 			// TODO: use this.Content to load your game content here
 			maze.LoadContent(Content);
 
-		}
+            // Load sound effects
+            wallCollisionAudio = Content.Load<SoundEffect>("Sounds/wallcollision_sound");
+            leftFootStepAudio = Content.Load<SoundEffect>("Sounds/leftfootstep_sound");
+            rightFootStepAudio = Content.Load<SoundEffect>("Sounds/rightfootstep_sound");
+
+            musicDay = Content.Load<SoundEffect>("Sounds/medievil_music");
+            musicNight = Content.Load<SoundEffect>("Sounds/medievil_music2");
+            currentMusic = musicDay.CreateInstance();
+            currentMusic.Volume = 1f;
+            currentMusic.IsLooped = true;
+            music = true;
+            currentMusic.Play();
+
+           
+        }
 
 		/// <summary>
 		/// UnloadContent will be called once per game and is the place to unload
@@ -131,6 +158,7 @@ namespace MazeGame
             FogToggle(currentKeyboardState, currentGamePadState);
             AmbientToggle(currentKeyboardState, currentGamePadState);
             FlashToggle(currentKeyboardState, currentGamePadState);
+            MusicToggle(currentKeyboardState, currentGamePadState);
 
             // save previous states
             previousKeyboardState = currentKeyboardState;
@@ -156,11 +184,19 @@ namespace MazeGame
                 // toggle Fog on/off
                 if (fog)
                 {
+                    // enable fog
                     effect.Parameters["fog"].StructureMembers["FogEnabled"].SetValue(true);
+                    // if music is on then half volume set while there is fog
+                    if (music) 
+                        currentMusic.Volume = 0.5f;
                 }
                 else
                 {
+                    //diable fog
                     effect.Parameters["fog"].StructureMembers["FogEnabled"].SetValue(false);
+                    // if music is on then full volume while there is no fog
+                    if (music)
+                        currentMusic.Volume = 1f;
                 }
             }
 
@@ -181,11 +217,19 @@ namespace MazeGame
                 {
                     skyColor = Color.DeepSkyBlue;
                     effect.Parameters["material"].StructureMembers["ambient"].SetValue(new Vector4(0.65f, 0.65f, 0.6f, 1.0f));
+                    currentMusic.Stop();
+                    currentMusic.Dispose();
+                    currentMusic = musicDay.CreateInstance();
+                    currentMusic.Play();
                 }
                 else
                 {
                     skyColor = Color.DarkSlateGray;
                     effect.Parameters["material"].StructureMembers["ambient"].SetValue(new Vector4(0.1f, 0.1f, 0.15f, 1.0f));
+                    currentMusic.Stop();
+                    currentMusic.Dispose();
+                    currentMusic = musicNight.CreateInstance();
+                    currentMusic.Play();
                 }
                 
             }
@@ -213,12 +257,35 @@ namespace MazeGame
             
         }
 
+        protected void MusicToggle(KeyboardState currentKeyboardState, GamePadState currentGamePadState)
+        {
 
-		/// <summary>
-		/// This is called when the game should draw itself.
-		/// </summary>
-		/// <param name="gameTime">Provides a snapshot of timing values.</param>
-		protected override void Draw( GameTime gameTime )
+            if ((previousKeyboardState.IsKeyDown(Keys.X) &&
+                currentKeyboardState.IsKeyUp(Keys.X)) ||
+                (previousGamePadState.IsButtonDown(Buttons.RightStick) &&
+                currentGamePadState.IsButtonUp(Buttons.RightStick)))
+            {
+                music = !music;
+
+                // toggle music on/off
+                if (music)
+                {
+                    currentMusic.Volume = 1f;
+                }
+                else
+                {
+                    currentMusic.Volume = 0f;
+                }
+            }
+
+        }
+
+
+        /// <summary>
+        /// This is called when the game should draw itself.
+        /// </summary>
+        /// <param name="gameTime">Provides a snapshot of timing values.</param>
+        protected override void Draw( GameTime gameTime )
 		{
 			GraphicsDevice.Clear(skyColor);
 

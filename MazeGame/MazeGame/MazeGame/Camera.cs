@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Audio;
 
 namespace MazeGame
 {
@@ -40,6 +41,8 @@ namespace MazeGame
         float moveScale = 1.5f;
         float rotateScale = MathHelper.PiOver2;
         bool collision;
+        SoundEffect wallCollisionAudio;
+        bool wallSound;
 
         /// <summary>
         /// Changes the Field of view to zoom in and out
@@ -134,7 +137,7 @@ namespace MazeGame
         /// <param name="aspectRatio">aspect ratio determines zoom fisheye or telephoto</param>
         /// <param name="nearClip">near clip plane for rendring</param>
         /// <param name="farClip">far clip plane for rendering</param>
-		public Camera(Vector3 position, float rotation, float aspectRatio, float nearClip, float farClip)
+		public Camera(Vector3 position, float rotation, float aspectRatio, float nearClip, float farClip, SoundEffect wallCollisionAudio)
         {
 			// Setup camera projection
             Projection = Matrix.CreatePerspectiveFieldOfView(
@@ -156,7 +159,10 @@ namespace MazeGame
 
             // Set collision 
             collision = true;
-		}
+
+            // set audio to play on collision with wall
+            this.wallCollisionAudio = wallCollisionAudio;
+        }
 
 
         /// <summary>
@@ -412,7 +418,18 @@ namespace MazeGame
                     foreach (BoundingBox box in maze.GetBoundsForCell((int)newLocation.X, (int)newLocation.Z))
                     {
                         if (box.Contains(newLocation) == ContainmentType.Contains)
+                        {
                             moveOk = false;
+                            if (wallSound)
+                            {
+                                wallCollisionAudio.Play();
+                            }
+                            wallSound = true;
+                        }
+                        else
+                        {
+                            wallSound = true;
+                        }
                     }
 
                 if (moveOk)
