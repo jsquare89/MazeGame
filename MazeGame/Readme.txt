@@ -14,6 +14,7 @@ Toggle Fog 		- Q, X button
 Toggle Day/Night	- E, Right Shoulder button
 Toggle Flash		- F, Left Shoulder button
 Toggle Collision	- C, Y button
+Toggle Wall		- R, DPad Down button
 Zoom in			- Z, B button
 Zoom out		- Shift Z, A button
 
