@@ -193,7 +193,7 @@ namespace MazeGame
 		}
 		
         /// <summary>
-        /// Calvulates the camera movement and used to detect whether there will be collision before actually making the camera move
+        /// Calculates the camera movement and used to detect whether there will be collision before actually making the camera move
         /// </summary>
         /// <param name="movement"></param>
         /// <returns></returns>
@@ -400,8 +400,10 @@ namespace MazeGame
             }
         }
 
-        public void Update(Maze maze)
+        public void Update(GameTime gameTime, Maze maze, AudioListener listener)
         {
+             float elapsedTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
             // Restrain movement to the maze width and height
             if (moveAmount.Z != 0 || moveAmount.X != 0)
             {
@@ -433,8 +435,26 @@ namespace MazeGame
                     }
 
                 if (moveOk)
+                {
                     MoveForward(moveAmount);
+                    listener.Velocity = (newLocation - position) / elapsedTime;
+                }
+                else
+                {
+                    listener.Velocity = Vector3.Zero;
+                }
             }
+            else
+            {
+                listener.Velocity = Vector3.Zero;
+            }
+
+            
+            listener.Position = Position;
+            listener.Up = View.Up;
+            listener.Forward = View.Forward;
+                
+            
         }
         
     }

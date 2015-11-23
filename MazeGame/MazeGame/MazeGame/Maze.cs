@@ -400,14 +400,17 @@ namespace MazeGame
             effect.Parameters["fog"].StructureMembers["FogColor"].SetValue(Color.Black.ToVector3());
         }
 
-        public void Draw(Camera camera, Effect effect)
+        public void Draw(Camera camera, Effect effect, bool drawWall)
         {
 
             device.SamplerStates[0] = SamplerState.LinearClamp;
 
             ConfigureShader(camera, effect);
             DrawFloors(camera, effect);
-            DrawWalls(camera, effect);
+            if (drawWall)
+            { 
+                DrawWalls(camera, effect);
+            }
         }
     }
 }

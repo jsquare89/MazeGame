@@ -11,7 +11,7 @@ namespace MazeGame
         public static float masterDefaultVolume = 1.0f;
         private static float masterVolume = masterDefaultVolume;
         private static bool masterMuted = false;
-        static SoundEffectInstance currentSong;
+        public static SoundEffectInstance currentSong;
 
         //Plays the provided song in a loop.
         public static void PlaySong(SoundEffect song)

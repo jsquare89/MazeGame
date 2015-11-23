@@ -21,6 +21,9 @@ namespace MazeGame
 
 		Camera camera;
 		Maze maze;
+        // debug purpose to toggle walls
+        bool drawWall;
+		Enemy enemy;
         Effect effect;
 
         // Input handling
@@ -35,15 +38,19 @@ namespace MazeGame
 
         // Sounds & Music
         bool music; // used to turn on and off
+        
+        SoundEffectInstance currentMusic;
         SoundEffect wallCollisionAudio;
         SoundEffect leftFootStepAudio;
         SoundEffect rightFootStepAudio;
         SoundEffect musicDay;
         SoundEffect musicNight;
-        SoundEffectInstance currentMusic;
+        AudioListener listener;
+
 
 
         public MazeGame()
+
 		{
 			graphics = new GraphicsDeviceManager( this );
 			Content.RootDirectory = "Content";
@@ -60,6 +67,9 @@ namespace MazeGame
             graphics.PreferredBackBufferHeight = 720;
             graphics.IsFullScreen = false;
             graphics.ApplyChanges();
+
+            SoundEffect.DistanceScale = 1;
+            SoundEffect.DopplerScale = 0.1f;
 
             // initialise sound for camera
             wallCollisionAudio = Content.Load<SoundEffect>("Sounds/wallcollision_sound");
@@ -79,6 +89,7 @@ namespace MazeGame
             fog = false;
             ambient = true;
             skyColor = Color.DeepSkyBlue;
+            listener = new AudioListener();
 
 			base.Initialize();
 		}
@@ -98,9 +109,6 @@ namespace MazeGame
             effect.Parameters["fog"].StructureMembers["FogEnabled"].SetValue(false);
             effect.Parameters["light"].StructureMembers["radius"].SetValue(0.1f);
             
-			// TODO: use this.Content to load your game content here
-			maze.LoadContent(Content);
-
             // Load sound effects
             wallCollisionAudio = Content.Load<SoundEffect>("Sounds/wallcollision_sound");
             leftFootStepAudio = Content.Load<SoundEffect>("Sounds/leftfootstep_sound");
@@ -112,8 +120,15 @@ namespace MazeGame
             currentMusic.Volume = 1f;
             currentMusic.IsLooped = true;
             music = true;
+            
+			maze.LoadContent(Content);
+			enemy = new Enemy(this, GraphicsDevice, 
+                Content.Load<Model>("enemy"), 
+                new Vector3(2.5f, 0, 2.5f),
+                leftFootStepAudio,
+                rightFootStepAudio);
+            enemy.Apply3DAudio(listener, enemy.Position, currentMusic);
             currentMusic.Play();
-
            
         }
 
@@ -143,7 +158,8 @@ namespace MazeGame
             HandleInput(currentKeyboardState, currentGamePadState, gameTime);
 
             // update camera movement and collision based on input
-            camera.Update(maze);
+            camera.Update( gameTime, maze, listener );
+            enemy.Update( gameTime, maze, listener, currentMusic );
 
 			base.Update( gameTime );
 		}
@@ -159,6 +175,7 @@ namespace MazeGame
             AmbientToggle(currentKeyboardState, currentGamePadState);
             FlashToggle(currentKeyboardState, currentGamePadState);
             MusicToggle(currentKeyboardState, currentGamePadState);
+            WallToggle(currentKeyboardState, currentGamePadState);
 
             // save previous states
             previousKeyboardState = currentKeyboardState;
@@ -211,26 +228,26 @@ namespace MazeGame
                 currentGamePadState.IsButtonUp(Buttons.RightShoulder))
             {
                 ambient = !ambient;
+                
+                currentMusic.Stop();
+                currentMusic.Dispose();
 
                 // Ambient true sets to day time effect, false sets to night time effect
                 if(ambient)
                 {
                     skyColor = Color.DeepSkyBlue;
                     effect.Parameters["material"].StructureMembers["ambient"].SetValue(new Vector4(0.65f, 0.65f, 0.6f, 1.0f));
-                    currentMusic.Stop();
-                    currentMusic.Dispose();
                     currentMusic = musicDay.CreateInstance();
-                    currentMusic.Play();
+                    
                 }
                 else
                 {
                     skyColor = Color.DarkSlateGray;
                     effect.Parameters["material"].StructureMembers["ambient"].SetValue(new Vector4(0.1f, 0.1f, 0.15f, 1.0f));
-                    currentMusic.Stop();
-                    currentMusic.Dispose();
                     currentMusic = musicNight.CreateInstance();
-                    currentMusic.Play();
                 }
+                enemy.Apply3DAudio(listener, enemy.Position, currentMusic);
+                currentMusic.Play();
                 
             }
         }
@@ -280,6 +297,19 @@ namespace MazeGame
 
         }
 
+        protected void WallToggle(KeyboardState currentKeyboardState, GamePadState currentGamePadState)
+        {
+
+            if ((previousKeyboardState.IsKeyDown(Keys.R) &&
+                currentKeyboardState.IsKeyUp(Keys.R)) ||
+                (previousGamePadState.IsButtonDown(Buttons.DPadDown) &&
+                currentGamePadState.IsButtonUp(Buttons.DPadDown)))
+            {
+                drawWall = !drawWall;
+            }
+
+        }
+
 
         /// <summary>
         /// This is called when the game should draw itself.
@@ -289,7 +319,8 @@ namespace MazeGame
 		{
 			GraphicsDevice.Clear(skyColor);
 
-			maze.Draw(camera, effect);
+			maze.Draw(camera, effect, drawWall);
+			enemy.Draw(camera, effect);
 
 			base.Draw( gameTime );
 		}
