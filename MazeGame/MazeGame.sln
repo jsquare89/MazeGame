@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MazeGame", "MazeGame\MazeGa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MazeGameContent", "MazeGame\MazeGameContent\MazeGameContent.contentproj", "{31F8B570-2109-4DA1-BC1D-8EFA80FBA436}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xbox 360 Copy (2) of MazeGame", "MazeGame\MazeGame\Xbox 360 Copy (2) of MazeGame.csproj", "{AC11975D-8088-4CAB-8729-0292F895D6B8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xbox 360 Copy of MazeGame", "MazeGame\MazeGame\Xbox 360 Copy of MazeGame.csproj", "{AC11975D-8088-4CAB-8729-0292F895D6B8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

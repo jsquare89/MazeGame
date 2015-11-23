@@ -41,8 +41,15 @@ namespace MazeGame
         float moveScale = 1.5f;
         float rotateScale = MathHelper.PiOver2;
         bool collision;
+        
+        SoundEffect leftFootStepAudio;
+        SoundEffect rightFootStepAudio;
         SoundEffect wallCollisionAudio;
         bool wallSound;
+        bool leftFootStep;
+
+        // How long until we should play the next sound.
+        TimeSpan timeDelay = TimeSpan.Zero;
 
         /// <summary>
         /// Changes the Field of view to zoom in and out
@@ -137,7 +144,8 @@ namespace MazeGame
         /// <param name="aspectRatio">aspect ratio determines zoom fisheye or telephoto</param>
         /// <param name="nearClip">near clip plane for rendring</param>
         /// <param name="farClip">far clip plane for rendering</param>
-		public Camera(Vector3 position, float rotation, float aspectRatio, float nearClip, float farClip, SoundEffect wallCollisionAudio)
+		public Camera(Vector3 position, float rotation, float aspectRatio, float nearClip, float farClip, 
+            SoundEffect wallCollisionAudio, SoundEffect leftFootStepAudio, SoundEffect rightFootStepAudio)
         {
 			// Setup camera projection
             Projection = Matrix.CreatePerspectiveFieldOfView(
@@ -160,8 +168,10 @@ namespace MazeGame
             // Set collision 
             collision = true;
 
-            // set audio to play on collision with wall
+            // set audio to play
             this.wallCollisionAudio = wallCollisionAudio;
+            this.leftFootStepAudio = leftFootStepAudio;
+            this.rightFootStepAudio = rightFootStepAudio;
         }
 
 
@@ -212,7 +222,7 @@ namespace MazeGame
         /// <param name="movement">the amount and direction the camera should move forward by</param>
 		public void MoveForward(Vector3 movement)
 		{
-			MoveTo(PreviewMove(movement), rotationX);	
+			MoveTo(PreviewMove(movement), rotationX);
 		}
 
         /// <summary>
@@ -437,6 +447,19 @@ namespace MazeGame
                 if (moveOk)
                 {
                     MoveForward(moveAmount);
+                    // If the time delay has run out, trigger another single-shot sound.
+                    timeDelay -= gameTime.ElapsedGameTime;
+
+                    if (timeDelay < TimeSpan.Zero)
+                    {
+                        if (leftFootStep)
+                            leftFootStepAudio.Play();
+                        else
+                            rightFootStepAudio.Play();
+
+                        leftFootStep = !leftFootStep;
+                        timeDelay += TimeSpan.FromSeconds(.5f);
+                    }
                     listener.Velocity = (newLocation - position) / elapsedTime;
                 }
                 else

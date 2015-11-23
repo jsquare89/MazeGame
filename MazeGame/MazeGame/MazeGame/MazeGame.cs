@@ -74,14 +74,6 @@ namespace MazeGame
             // initialise sound for camera
             wallCollisionAudio = Content.Load<SoundEffect>("Sounds/wallcollision_sound");
 
-            // Setup camera
-            camera = new Camera(
-				new Vector3(0.5f, 0.5f, 0.5f),
-				0,
-				GraphicsDevice.Viewport.AspectRatio,
-				0.05f,
-				100f, wallCollisionAudio);
-
             // Other variables to initialize
             maze = new Maze(GraphicsDevice);
 
@@ -122,6 +114,18 @@ namespace MazeGame
             music = true;
             
 			maze.LoadContent(Content);
+            
+            // Setup camera
+            camera = new Camera(
+				new Vector3(0.5f, 0.5f, 0.5f),
+				0,
+				GraphicsDevice.Viewport.AspectRatio,
+				0.05f,
+				100f, 
+                wallCollisionAudio,
+                leftFootStepAudio,
+                rightFootStepAudio);
+
 			enemy = new Enemy(this, GraphicsDevice, 
                 Content.Load<Model>("enemy"), 
                 new Vector3(2.5f, 0, 2.5f),
