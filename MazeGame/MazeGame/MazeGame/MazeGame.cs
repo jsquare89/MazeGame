@@ -22,7 +22,7 @@ namespace MazeGame
 		Camera camera;
 		Maze maze;
         // debug purpose to toggle walls
-        bool drawWall;
+        bool drawWall = true;
 		Enemy enemy;
         Effect effect;
 
@@ -41,8 +41,8 @@ namespace MazeGame
         
         SoundEffectInstance currentMusic;
         SoundEffect wallCollisionAudio;
-        SoundEffect leftFootStepAudio;
-        SoundEffect rightFootStepAudio;
+        SoundEffect leftFootStepSound;
+        SoundEffect rightFootStepSound;
         SoundEffect musicDay;
         SoundEffect musicNight;
         AudioListener listener;
@@ -68,6 +68,7 @@ namespace MazeGame
             graphics.IsFullScreen = false;
             graphics.ApplyChanges();
 
+
             SoundEffect.DistanceScale = 1;
             SoundEffect.DopplerScale = 0.1f;
 
@@ -92,8 +93,24 @@ namespace MazeGame
 		/// </summary>
 		protected override void LoadContent()
 		{
-			// Create a new SpriteBatch, which can be used to draw textures.
-			spriteBatch = new SpriteBatch( GraphicsDevice );
+
+            // initialise sound for camera
+            wallCollisionAudio = Content.Load<SoundEffect>("Sounds/wallcollision_sound");
+            leftFootStepSound = Content.Load<SoundEffect>("Sounds/leftfootstep_sound");
+            rightFootStepSound = Content.Load<SoundEffect>("Sounds/rightfootstep_sound");
+
+            // Setup camera
+            camera = new Camera(
+                new Vector3(0.5f, 0.5f, 0.5f),
+                0,
+                GraphicsDevice.Viewport.AspectRatio,
+                0.05f,
+                100f, wallCollisionAudio,
+                leftFootStepSound,
+                rightFootStepSound);
+
+            // Create a new SpriteBatch, which can be used to draw textures.
+            spriteBatch = new SpriteBatch( GraphicsDevice );
 
             // Load shader and set defaults
             effect = Content.Load<Effect>("shader");
@@ -103,8 +120,8 @@ namespace MazeGame
             
             // Load sound effects
             wallCollisionAudio = Content.Load<SoundEffect>("Sounds/wallcollision_sound");
-            leftFootStepAudio = Content.Load<SoundEffect>("Sounds/leftfootstep_sound");
-            rightFootStepAudio = Content.Load<SoundEffect>("Sounds/rightfootstep_sound");
+            leftFootStepSound = Content.Load<SoundEffect>("Sounds/leftfootstep_sound");
+            rightFootStepSound = Content.Load<SoundEffect>("Sounds/rightfootstep_sound");
 
             musicDay = Content.Load<SoundEffect>("Sounds/medievil_music");
             musicNight = Content.Load<SoundEffect>("Sounds/medievil_music2");
@@ -123,14 +140,14 @@ namespace MazeGame
 				0.05f,
 				100f, 
                 wallCollisionAudio,
-                leftFootStepAudio,
-                rightFootStepAudio);
+                leftFootStepSound,
+                rightFootStepSound);
 
 			enemy = new Enemy(this, GraphicsDevice, 
                 Content.Load<Model>("enemy"), 
                 new Vector3(2.5f, 0, 2.5f),
-                leftFootStepAudio,
-                rightFootStepAudio);
+                leftFootStepSound,
+                rightFootStepSound);
             enemy.Apply3DAudio(listener, enemy.Position, currentMusic);
             currentMusic.Play();
            

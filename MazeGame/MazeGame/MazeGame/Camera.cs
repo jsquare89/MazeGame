@@ -9,17 +9,18 @@ using Microsoft.Xna.Framework.Audio;
 namespace MazeGame
 {
     class Camera
-	{
-		private float zoom = 1;
-		private Vector3 position = Vector3.Zero;
+    {
+        private float zoom = 1;
+        private Vector3 position = Vector3.Zero;
+        private Vector3 previoiusPosition = Vector3.Zero;
         private Vector3 initialPosition;
         private float initialRotation;
-		private float rotationX;
+        private float rotationX;
         private float rotationY;
-		private Vector3 lookAt;
-		private Vector3 baseCameraReference = new Vector3(0, 0, 1);
-		private bool needViewResync = true;
-		private Matrix cachedViewMatrix;
+        private Vector3 lookAt;
+        private Vector3 baseCameraReference = new Vector3(0, 0, 1);
+        private bool needViewResync = true;
+        private Matrix cachedViewMatrix;
 
         // used for zoom function
         float zoomScale = 1.5f;
@@ -29,7 +30,7 @@ namespace MazeGame
         float nearClip;
         float farClip;
 
-        const float MAX_Y= MathHelper.PiOver2;
+        const float MAX_Y = MathHelper.PiOver2;
         const float MIN_Y = MathHelper.PiOver2;
 
         // Input handling
@@ -41,15 +42,19 @@ namespace MazeGame
         float moveScale = 1.5f;
         float rotateScale = MathHelper.PiOver2;
         bool collision;
-        
-        SoundEffect leftFootStepAudio;
-        SoundEffect rightFootStepAudio;
-        SoundEffect wallCollisionAudio;
-        bool wallSound;
-        bool leftFootStep;
 
-        // How long until we should play the next sound.
-        TimeSpan timeDelay = TimeSpan.Zero;
+        // Collision sounds handling
+        SoundEffect wallCollisionSound;
+        bool wallSound;
+        const float WALL_COLLISION_DELAY = 500;
+        int wallCollisionElapsedTime;
+
+        // footstep sound handling
+        bool footsteps;
+        float footStepElapsedTime;
+        const float FOOT_STEP_DELAY = 600;
+        SoundEffect leftFootstepSound;
+        SoundEffect rightFootstepSound;
 
         /// <summary>
         /// Changes the Field of view to zoom in and out
@@ -73,36 +78,36 @@ namespace MazeGame
             }
         }
 
-		public Matrix Projection
-		{
-			get; private set;
-		}
+        public Matrix Projection
+        {
+            get; private set;
+        }
 
-		public Vector3 Position
-		{
-			get
-			{
-				return position;		
-			}
-			set
-			{
-				position = value;
-				UpdateLookAt();		
-			}
-		}
+        public Vector3 Position
+        {
+            get
+            {
+                return position;
+            }
+            set
+            {
+                position = value;
+                UpdateLookAt();
+            }
+        }
 
-		public float RotationX
-		{
-			get
-			{
-				return rotationX;		
-			}	
-			set
-			{
-				rotationX = value;
-				UpdateLookAt();
-			}
-		}
+        public float RotationX
+        {
+            get
+            {
+                return rotationX;
+            }
+            set
+            {
+                rotationX = value;
+                UpdateLookAt();
+            }
+        }
 
         public float RotationY
         {
@@ -117,22 +122,22 @@ namespace MazeGame
             }
         }
 
-		public Matrix View
-		{
-			get
-			{
-				if ( needViewResync )
-				{
-					cachedViewMatrix = Matrix.CreateLookAt(
-						Position,
-						lookAt,
-						Vector3.Up);
-					cachedViewMatrix *= Matrix.CreateRotationX(-rotationY);
-				}
-					
-				return cachedViewMatrix;
-			}
-		}
+        public Matrix View
+        {
+            get
+            {
+                if (needViewResync)
+                {
+                    cachedViewMatrix = Matrix.CreateLookAt(
+                        Position,
+                        lookAt,
+                        Vector3.Up);
+                    cachedViewMatrix *= Matrix.CreateRotationX(-rotationY);
+                }
+
+                return cachedViewMatrix;
+            }
+        }
 
 
 
@@ -144,10 +149,10 @@ namespace MazeGame
         /// <param name="aspectRatio">aspect ratio determines zoom fisheye or telephoto</param>
         /// <param name="nearClip">near clip plane for rendring</param>
         /// <param name="farClip">far clip plane for rendering</param>
-		public Camera(Vector3 position, float rotation, float aspectRatio, float nearClip, float farClip, 
-            SoundEffect wallCollisionAudio, SoundEffect leftFootStepAudio, SoundEffect rightFootStepAudio)
+
+		public Camera(Vector3 position, float rotation, float aspectRatio, float nearClip, float farClip, SoundEffect wallCollisionSound, SoundEffect leftFootstepSound, SoundEffect rightFootstepSound)
         {
-			// Setup camera projection
+            // Setup camera projection
             Projection = Matrix.CreatePerspectiveFieldOfView(
                 MathHelper.PiOver4 / Zoom,
                 aspectRatio,
@@ -160,7 +165,7 @@ namespace MazeGame
             this.farClip = farClip;
             rotationX = rotation;
 
-			MoveTo(position, rotation);
+            MoveTo(position, rotation);
 
             initialPosition = position;
             initialRotation = rotation;
@@ -169,9 +174,9 @@ namespace MazeGame
             collision = true;
 
             // set audio to play
-            this.wallCollisionAudio = wallCollisionAudio;
-            this.leftFootStepAudio = leftFootStepAudio;
-            this.rightFootStepAudio = rightFootStepAudio;
+            this.wallCollisionSound = wallCollisionSound;
+            this.leftFootstepSound = leftFootstepSound;
+            this.rightFootstepSound = rightFootstepSound;
         }
 
 
@@ -180,50 +185,50 @@ namespace MazeGame
         /// </summary>
         /// <param name="position">position to move to</param>
         /// <param name="rotation">rotation to rotate camera by</param>
-		public void MoveTo( Vector3 position, float rotation )
-		{
-			this.position = position;
-			this.rotationX = rotation;
-			UpdateLookAt();
-		}
+		public void MoveTo(Vector3 position, float rotation)
+        {
+            this.position = position;
+            this.rotationX = rotation;
+            UpdateLookAt();
+        }
 
         /// <summary>
         /// Update the camera look at position based on rotation
         /// </summary>
 		private void UpdateLookAt()
-		{
-			Matrix rotationMatrix = Matrix.CreateRotationY(rotationX);
-			Vector3 lookAtOffset = Vector3.Transform(
-				baseCameraReference,
-				rotationMatrix);
-			lookAt = position + lookAtOffset;
+        {
+            Matrix rotationMatrix = Matrix.CreateRotationY(rotationX);
+            Vector3 lookAtOffset = Vector3.Transform(
+                baseCameraReference,
+                rotationMatrix);
+            lookAt = position + lookAtOffset;
 
             // Resync view to reflect camera changes
-			needViewResync = true;
-		}
-		
+            needViewResync = true;
+        }
+
         /// <summary>
         /// Calculates the camera movement and used to detect whether there will be collision before actually making the camera move
         /// </summary>
         /// <param name="movement"></param>
         /// <returns></returns>
-		public Vector3 PreviewMove(Vector3 movement)
-		{
-			Matrix rotate = Matrix.CreateRotationY(rotationX);
-			//Vector3 forward = new Vector3(0, 0, scale);
-			movement = Vector3.Transform(movement, rotate);
-            
-			return (position + movement);
-		}
+        public Vector3 PreviewMove(Vector3 movement)
+        {
+            Matrix rotate = Matrix.CreateRotationY(rotationX);
+            //Vector3 forward = new Vector3(0, 0, scale);
+            movement = Vector3.Transform(movement, rotate);
+
+            return (position + movement);
+        }
 
         /// <summary>
         /// Move camera forward by movement vector
         /// </summary>
         /// <param name="movement">the amount and direction the camera should move forward by</param>
 		public void MoveForward(Vector3 movement)
-		{
-			MoveTo(PreviewMove(movement), rotationX);
-		}
+        {
+            MoveTo(PreviewMove(movement), rotationX);
+        }
 
         /// <summary>
         /// Resest position to the initial position the was stored when the camera was first created
@@ -261,7 +266,7 @@ namespace MazeGame
 
         public void HandleKeyboadInput(KeyboardState currentKeyboardState, GameTime gameTime)
         {
-            float elapsedTime = (float)gameTime.ElapsedGameTime.TotalSeconds;            
+            float elapsedTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             // Move Forward
             if (currentKeyboardState.IsKeyDown(Keys.W))
@@ -340,7 +345,7 @@ namespace MazeGame
         public void HandleGamePadInput(GamePadState currentGamePadState, GameTime gameTime)
         {
             float elapsedTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
-            
+
             if (currentGamePadState.IsConnected)
             {
                 // Move Forward
@@ -410,9 +415,13 @@ namespace MazeGame
             }
         }
 
+
         public void Update(GameTime gameTime, Maze maze, AudioListener listener)
         {
-             float elapsedTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            float elapsedTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            wallCollisionElapsedTime += gameTime.ElapsedGameTime.Milliseconds;
+            footStepElapsedTime += (float)gameTime.ElapsedGameTime.TotalMilliseconds;
+
 
             // Restrain movement to the maze width and height
             if (moveAmount.Z != 0 || moveAmount.X != 0)
@@ -432,40 +441,49 @@ namespace MazeGame
                         if (box.Contains(newLocation) == ContainmentType.Contains)
                         {
                             moveOk = false;
-                            if (wallSound)
+
+                            // check to play wall sounds if wallsound is true and there is a delap. dealys stops constant looping
+                            if (wallSound && wallCollisionElapsedTime > WALL_COLLISION_DELAY)
                             {
-                                wallCollisionAudio.Play();
+                                wallCollisionSound.Play();
+                                wallSound = false;
+
+                                // reset elapsedTime to provide a delay
+                                wallCollisionElapsedTime = 0;
+
                             }
-                            wallSound = true;
                         }
                         else
                         {
+                            // enable sounds again
                             wallSound = true;
                         }
                     }
 
+                // if no collision and ok to move the move and play footstep sound
                 if (moveOk)
                 {
                     MoveForward(moveAmount);
-                    // If the time delay has run out, trigger another single-shot sound.
-                    timeDelay -= gameTime.ElapsedGameTime;
-
-                    if (timeDelay < TimeSpan.Zero)
-                    {
-                        if (leftFootStep)
-                            leftFootStepAudio.Play();
-                        else
-                            rightFootStepAudio.Play();
-
-                        leftFootStep = !leftFootStep;
-                        timeDelay += TimeSpan.FromSeconds(.5f);
-                    }
                     listener.Velocity = (newLocation - position) / elapsedTime;
+                
+                    // Play footstep sounds
+                    if (footStepElapsedTime > FOOT_STEP_DELAY)
+                    {
+                        if (footsteps)
+                            leftFootstepSound.Play();
+                        else
+                            rightFootstepSound.Play();
+                        footsteps = !footsteps;
+
+                        footStepElapsedTime = 0;
+                    }
+
                 }
                 else
                 {
                     listener.Velocity = Vector3.Zero;
                 }
+
             }
             else
             {
@@ -479,6 +497,6 @@ namespace MazeGame
                 
             
         }
-        
+
     }
 }
