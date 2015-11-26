@@ -341,7 +341,7 @@ namespace MazeGame
 			GraphicsDevice.Clear(skyColor);
 
 			maze.Draw(camera, effect, drawWall);
-			enemy.Draw(camera, effect);
+			enemy.Draw(camera);
 
 			base.Draw( gameTime );
 		}
