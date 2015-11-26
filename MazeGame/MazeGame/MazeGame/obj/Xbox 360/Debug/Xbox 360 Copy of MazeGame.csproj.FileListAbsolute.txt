@@ -35,7 +35,7 @@ C:\Users\Jarred\Documents\GitHub\MazeGame\MazeGame\MazeGame\MazeGame\bin\Xbox 36
 C:\Users\Jarred\Documents\GitHub\MazeGame\MazeGame\MazeGame\MazeGame\bin\Xbox 360\Debug\Content\Sounds\wallcollision_sound.xnb
 C:\Users\Jarred\Documents\GitHub\MazeGame\MazeGame\MazeGame\MazeGame\bin\Xbox 360\Debug\MazeGame.exe
 C:\Users\Jarred\Documents\GitHub\MazeGame\MazeGame\MazeGame\MazeGame\bin\Xbox 360\Debug\MazeGame.pdb
-C:\Users\Jarred\Documents\GitHub\MazeGame\MazeGame\MazeGame\MazeGame\obj\Xbox 360\Debug\Xbox 360 Copy of MazeGame.csprojResolveAssemblyReference.cache
 C:\Users\Jarred\Documents\GitHub\MazeGame\MazeGame\MazeGame\MazeGame\obj\Xbox 360\Debug\Microsoft.Xna.Framework.RuntimeProfile.txt
 C:\Users\Jarred\Documents\GitHub\MazeGame\MazeGame\MazeGame\MazeGame\obj\Xbox 360\Debug\MazeGame.exe
 C:\Users\Jarred\Documents\GitHub\MazeGame\MazeGame\MazeGame\MazeGame\obj\Xbox 360\Debug\MazeGame.pdb
+C:\Users\Jarred\Documents\GitHub\MazeGame\MazeGame\MazeGame\MazeGame\bin\Xbox 360\Debug\Content\enemy.xnb
